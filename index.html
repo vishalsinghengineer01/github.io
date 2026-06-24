@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vishal Singh — Flutter Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050810;
+  --bg2: #080d1a;
+  --card: #0d1424;
+  --card2: #111827;
+  --blue: #3b82f6;
+  --indigo: #6366f1;
+  --purple: #8b5cf6;
+  --teal: #14b8a6;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --border: rgba(255,255,255,0.07);
+  --glow: rgba(99,102,241,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* CANVAS BG */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.4;}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");opacity:0.4;pointer-events:none;z-index:1;}
+
+.wrap{position:relative;z-index:2;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(20px);border-bottom:1px solid var(--border);background:rgba(5,8,16,0.7);}
+.nav-logo{font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--indigo);}
+.nav-logo span{color:var(--text2);}
+.nav-links{display:flex;gap:2rem;}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.2s;letter-spacing:0.05em;}
+.nav-links a:hover{color:var(--blue);}
+.nav-cta{background:linear-gradient(135deg,var(--indigo),var(--purple));padding:0.5rem 1.2rem;border-radius:8px;color:white!important;font-size:0.8rem!important;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem 4rem;text-align:center;position:relative;}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--indigo);letter-spacing:0.2em;margin-bottom:1.5rem;opacity:0;animation:fadeUp 0.8s 0.2s forwards;}
+.hero-name{font-size:clamp(3rem,8vw,6rem);font-weight:700;line-height:1;margin-bottom:1rem;opacity:0;animation:fadeUp 0.8s 0.4s forwards;}
+.hero-name .first{color:var(--text);}
+.hero-name .last{background:linear-gradient(135deg,var(--blue),var(--indigo),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-title{font-size:clamp(1rem,2.5vw,1.3rem);color:var(--text2);font-weight:400;margin-bottom:2rem;opacity:0;animation:fadeUp 0.8s 0.6s forwards;}
+.hero-highlight{color:var(--teal);font-weight:600;}
+.hero-badges{display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;margin-bottom:3rem;opacity:0;animation:fadeUp 0.8s 0.8s forwards;}
+.badge{background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:0.4rem 1rem;border-radius:100px;font-size:0.78rem;color:var(--text2);display:flex;align-items:center;gap:0.4rem;}
+.badge.special{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.08);color:var(--amber);}
+.badge.govt{border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--green);}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp 0.8s 1s forwards;}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--indigo));padding:0.85rem 2rem;border-radius:12px;color:white;text-decoration:none;font-weight:600;font-size:0.9rem;transition:transform 0.2s,box-shadow 0.2s;display:flex;align-items:center;gap:0.5rem;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(99,102,241,0.4);}
+.btn-secondary{background:transparent;border:1px solid var(--border);padding:0.85rem 2rem;border-radius:12px;color:var(--text2);text-decoration:none;font-weight:500;font-size:0.9rem;transition:all 0.2s;display:flex;align-items:center;gap:0.5rem;}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue);}
+.scroll-indicator{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeIn 1s 1.5s forwards;}
+.scroll-line{width:1px;height:60px;background:linear-gradient(to bottom,var(--indigo),transparent);animation:scrollPulse 2s infinite;}
+
+/* STATS */
+.stats{padding:4rem 2rem;max-width:1100px;margin:0 auto;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;text-align:center;transition:transform 0.3s,border-color 0.3s;opacity:0;transform:translateY(20px);}
+.stat-card.visible{opacity:1;transform:translateY(0);}
+.stat-card:hover{transform:translateY(-4px);border-color:rgba(99,102,241,0.3);}
+.stat-num{font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-label{font-size:0.8rem;color:var(--text3);margin-top:0.25rem;font-weight:500;}
+
+/* SECTION COMMON */
+section{padding:5rem 2rem;max-width:1100px;margin:0 auto;}
+.section-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--indigo);letter-spacing:0.2em;margin-bottom:0.75rem;}
+.section-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700;margin-bottom:1rem;line-height:1.2;}
+.section-sub{color:var(--text2);font-size:0.95rem;max-width:600px;line-height:1.7;margin-bottom:3rem;}
+
+/* EXPERIENCE */
+.exp-timeline{position:relative;}
+.exp-timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--indigo),var(--purple),transparent);}
+.exp-item{padding-left:2.5rem;margin-bottom:2.5rem;position:relative;opacity:0;transform:translateX(-20px);transition:all 0.6s;}
+.exp-item.visible{opacity:1;transform:translateX(0);}
+.exp-dot{position:absolute;left:-5px;top:6px;width:11px;height:11px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 12px rgba(99,102,241,0.5);}
+.exp-period{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--indigo);letter-spacing:0.1em;margin-bottom:0.4rem;}
+.exp-role{font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;}
+.exp-company{font-size:0.85rem;color:var(--teal);font-weight:500;margin-bottom:0.75rem;}
+.exp-desc{font-size:0.85rem;color:var(--text2);line-height:1.7;}
+.exp-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem;}
+.exp-tag{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);padding:0.25rem 0.7rem;border-radius:100px;font-size:0.72rem;color:var(--indigo);}
+
+/* PROJECTS */
+.projects-filter{display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.filter-btn{background:transparent;border:1px solid var(--border);padding:0.4rem 1rem;border-radius:100px;font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:'Space Grotesk',sans-serif;}
+.filter-btn.active,.filter-btn:hover{background:linear-gradient(135deg,var(--indigo),var(--purple));border-color:transparent;color:white;}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;}
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.5rem;transition:all 0.3s;cursor:pointer;position:relative;overflow:hidden;opacity:0;transform:translateY(20px);}
+.project-card.visible{opacity:1;transform:translateY(0);}
+.project-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--indigo),var(--purple));opacity:0;transition:opacity 0.3s;border-radius:20px;}
+.project-card:hover{transform:translateY(-6px);border-color:rgba(99,102,241,0.4);box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+.project-card:hover::before{opacity:0.04;}
+.project-card-inner{position:relative;z-index:1;}
+.project-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;}
+.project-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.project-badges{display:flex;flex-direction:column;gap:0.3rem;align-items:flex-end;}
+.project-badge{font-size:0.65rem;padding:0.2rem 0.6rem;border-radius:100px;font-weight:600;white-space:nowrap;}
+.badge-govt{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3);}
+.badge-store{background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);}
+.badge-solo{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3);}
+.badge-special{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3);}
+.project-name{font-size:1.05rem;font-weight:600;margin-bottom:0.4rem;color:var(--text);}
+.project-desc{font-size:0.82rem;color:var(--text2);line-height:1.6;margin-bottom:1rem;}
+.project-features{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;}
+.feature-chip{background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.7rem;color:var(--text3);}
+.project-tech{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.tech-tag{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--teal);background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.2);padding:0.2rem 0.5rem;border-radius:6px;}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.skill-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;opacity:0;transform:translateY(20px);transition:all 0.5s;}
+.skill-card.visible{opacity:1;transform:translateY(0);}
+.skill-card:hover{border-color:rgba(99,102,241,0.3);}
+.skill-cat{font-size:0.7rem;color:var(--indigo);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;font-family:'JetBrains Mono',monospace;}
+.skill-items{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.skill-item{background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:0.3rem 0.7rem;border-radius:8px;font-size:0.78rem;color:var(--text2);transition:all 0.2s;}
+.skill-item:hover{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--text);}
+.skill-item.highlight{background:rgba(20,184,166,0.1);border-color:rgba(20,184,166,0.3);color:var(--teal);}
+
+/* ACHIEVEMENTS */
+.achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;}
+.ach-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;display:flex;gap:1rem;align-items:flex-start;opacity:0;transform:translateY(20px);transition:all 0.5s;}
+.ach-card.visible{opacity:1;transform:translateY(0);}
+.ach-card:hover{border-color:rgba(245,158,11,0.3);transform:translateY(-4px);}
+.ach-icon{font-size:1.8rem;flex-shrink:0;}
+.ach-title{font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;}
+.ach-desc{font-size:0.78rem;color:var(--text2);line-height:1.6;}
+
+/* CONTACT */
+.contact-wrap{background:var(--card2);border:1px solid var(--border);border-radius:24px;padding:3rem;text-align:center;position:relative;overflow:hidden;}
+.contact-wrap::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at center,rgba(99,102,241,0.08) 0%,transparent 70%);pointer-events:none;}
+.contact-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin-bottom:1rem;}
+.contact-sub{color:var(--text2);margin-bottom:2rem;font-size:0.9rem;}
+.contact-links{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;}
+.contact-link{display:flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:0.75rem 1.5rem;border-radius:12px;color:var(--text2);text-decoration:none;font-size:0.85rem;transition:all 0.2s;}
+.contact-link:hover{border-color:var(--indigo);color:var(--text);background:rgba(99,102,241,0.1);}
+.contact-link svg{width:18px;height:18px;flex-shrink:0;}
+
+/* FOOTER */
+footer{text-align:center;padding:2rem;color:var(--text3);font-size:0.78rem;border-top:1px solid var(--border);position:relative;z-index:2;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(1);}50%{opacity:1;transform:scaleY(1.1);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes glow{0%,100%{opacity:0.3;}50%{opacity:0.7;}}
+
+.floating{animation:float 4s ease-in-out infinite;}
+.cursor-glow{pointer-events:none;position:fixed;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.12),transparent);transform:translate(-50%,-50%);z-index:1;transition:0.1s;}
+
+/* MOBILE */
+@media(max-width:768px){
+  nav{padding:1rem;}
+  .nav-links{display:none;}
+  .hero{padding:5rem 1.5rem 3rem;}
+  section{padding:3rem 1.5rem;}
+  .contact-wrap{padding:2rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="cursor-glow" id="cursor"></div>
+
+<div class="wrap">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">vs<span>.dev</span></div>
+  <div class="nav-links">
+    <a href="#experience">Experience</a>
+    <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="mailto:csvishal6724@gmail.com" class="nav-links"><a href="mailto:csvishal6724@gmail.com" class="nav-cta nav-links" style="text-decoration:none;">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">// flutter developer & mobile engineer</div>
+    <div class="hero-name">
+      <span class="first">Vishal </span><span class="last">Singh</span>
+    </div>
+    <div class="hero-title">
+      Building <span class="hero-highlight">production-grade apps</span> used by millions<br>
+      Government • Enterprise • FinTech • IoT
+    </div>
+    <div class="hero-badges">
+      <div class="badge special">🏛️ Dept. of Telecommunication, Govt. of India</div>
+      <div class="badge special">🎖️ App launched by Home Minister Shri Amit Shah</div>
+      <div class="badge govt">✅ 10+ Production Apps — Solo Developer</div>
+      <div class="badge">📱 Play Store & App Store</div>
+      <div class="badge">🤖 OpenAI / ChatGPT Integration</div>
+    </div>
+    <div class="hero-btns">
+      <a href="#projects" class="btn-primary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+        View Projects
+      </a>
+      <a href="mailto:csvishal6724@gmail.com" class="btn-secondary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        Get In Touch
+      </a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div style="font-size:0.7rem;color:var(--text3);letter-spacing:0.1em;">SCROLL</div>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">Production Apps Built</div></div>
+    <div class="stat-card"><div class="stat-num">2+</div><div class="stat-label">Years Experience</div></div>
+    <div class="stat-card"><div class="stat-num">7</div><div class="stat-label">Govt. Deployments</div></div>
+    <div class="stat-card"><div class="stat-num">100%</div><div class="stat-label">Solo Developer</div></div>
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-eyebrow">// career</div>
+  <div class="section-title">Professional Experience</div>
+  <div class="section-sub">From Jaipur startups to the Government of India — building real apps that real people use.</div>
+  <div class="exp-timeline">
+    <div class="exp-item">
+      <div class="exp-dot"></div>
+      <div class="exp-period">NOV 2025 — PRESENT</div>
+      <div class="exp-role">Software Developer — Telecom & Security</div>
+      <div class="exp-company">🏛️ Department of Telecommunication, Government of India · Delhi</div>
+      <div class="exp-desc">Developing secure T&S software systems supporting India's national telecom infrastructure. Contributing to government-grade security protocols and deployment pipelines under the Ministry of Communications.</div>
+      <div class="exp-tags">
+        <span class="exp-tag">Government</span><span class="exp-tag">Telecom</span><span class="exp-tag">Security</span><span class="exp-tag">National Infrastructure</span>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-dot"></div>
+      <div class="exp-period">SEP 2025 — NOV 2025</div>
+      <div class="exp-role">Flutter Developer</div>
+      <div class="exp-company">📦 Kotibox · Jaipur</div>
+      <div class="exp-desc">Built 4 production apps solo — Sofo (e-commerce marketplace), Magic Wash (service booking), Magic Genie (workforce management), and an international platform with Stripe payments.</div>
+      <div class="exp-tags">
+        <span class="exp-tag">E-Commerce</span><span class="exp-tag">Stripe</span><span class="exp-tag">GPS Delivery</span><span class="exp-tag">Workforce</span>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-dot"></div>
+      <div class="exp-period">JUL 2024 — SEP 2025 · 1yr 3mo</div>
+      <div class="exp-role">Flutter Developer</div>
+      <div class="exp-company">🏢 Vedant Infosoft And Solution Pvt. Ltd. · Jaipur</div>
+      <div class="exp-desc">Built 6 production apps including government projects. Highlights: RoboTouch (IoT massage chair app with 7 roles, published Play Store & App Store), Sweet Exchange (launched by Home Minister Shri Amit Shah), Water ATM, DIPR, Saras Marketing, Water Tanker System.</div>
+      <div class="exp-tags">
+        <span class="exp-tag">IoT Bluetooth</span><span class="exp-tag">Government</span><span class="exp-tag">GPS</span><span class="exp-tag">QR Pay</span><span class="exp-tag">Reports</span>
+      </div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-dot"></div>
+      <div class="exp-period">APR 2024 — JUN 2024 · 3mo</div>
+      <div class="exp-role">Cross-Platform Developer</div>
+      <div class="exp-company">🌐 WebrockMedia (WRM) · Jaipur</div>
+      <div class="exp-desc">Integrated OpenAI ChatGPT API for AI-powered chatbot. Built Flutter UI, Firebase integration, and contributed to YellWish (USA-based project).</div>
+      <div class="exp-tags">
+        <span class="exp-tag">OpenAI API</span><span class="exp-tag">Firebase</span><span class="exp-tag">USA Client</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" style="max-width:1200px;">
+  <div class="section-eyebrow">// work</div>
+  <div class="section-title">Featured Projects</div>
+  <div class="section-sub">10+ apps built solo — from architecture to Play Store deployment.</div>
+  <div class="projects-filter">
+    <button class="filter-btn active" data-filter="all">All Projects</button>
+    <button class="filter-btn" data-filter="govt">Government</button>
+    <button class="filter-btn" data-filter="iot">IoT & FinTech</button>
+    <button class="filter-btn" data-filter="ecommerce">E-Commerce</button>
+    <button class="filter-btn" data-filter="ai">AI</button>
+  </div>
+  <div class="projects-grid">
+
+    <!-- Sweet Exchange -->
+    <div class="project-card" data-cat="govt">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(245,158,11,0.15);">🏆</div>
+          <div class="project-badges">
+            <span class="project-badge badge-special">🎖️ Home Minister Launch</span>
+            <span class="project-badge badge-govt">Govt. of Rajasthan</span>
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">Sweet Exchange — RCDF</div>
+        <div class="project-desc">Government-authorized inter-dairy sweet exchange app for Rajasthan Cooperative Dairy Federation. Officially launched by Hon. Home Minister Shri Amit Shah.</div>
+        <div class="project-features">
+          <span class="feature-chip">Vehicle Tracking</span><span class="feature-chip">Order Approvals</span><span class="feature-chip">Dairy Logistics</span><span class="feature-chip">RCDF Integration</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">GPS</span><span class="tech-tag">REST API</span><span class="tech-tag">Firebase</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RoboTouch -->
+    <div class="project-card" data-cat="iot">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(99,102,241,0.15);">🤖</div>
+          <div class="project-badges">
+            <span class="project-badge badge-store">▶ Play Store</span>
+            <span class="project-badge badge-store">🍎 App Store</span>
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">RoboTouch — IoT Massage Chair</div>
+        <div class="project-desc">Role-based IoT app with 7 user roles to control massage chairs via encrypted Bluetooth BLE. Complete business management system.</div>
+        <div class="project-features">
+          <span class="feature-chip">7 Roles</span><span class="feature-chip">BLE Encrypted</span><span class="feature-chip">Digital Wallet</span><span class="feature-chip">QR Pay</span><span class="feature-chip">Mobile Recharge</span><span class="feature-chip">Family Recharge</span><span class="feature-chip">Fastag</span><span class="feature-chip">Excel Reports</span><span class="feature-chip">Role-based Nav</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">Bluetooth BLE</span><span class="tech-tag">Razorpay</span><span class="tech-tag">Firebase</span><span class="tech-tag">REST API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIPR -->
+    <div class="project-card" data-cat="govt">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(16,185,129,0.15);">🏛️</div>
+          <div class="project-badges">
+            <span class="project-badge badge-govt">Govt. Deployment</span>
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">DIPR — Govt. Field Reporting</div>
+        <div class="project-desc">Official government field reporting app for Dept. of Information & Public Relations with automated report generation.</div>
+        <div class="project-features">
+          <span class="feature-chip">EXIF Extraction</span><span class="feature-chip">Auto PDF Reports</span><span class="feature-chip">Auto Excel Reports</span><span class="feature-chip">Task Tracking</span><span class="feature-chip">GPS</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">GPS</span><span class="tech-tag">PDF Gen</span><span class="tech-tag">Excel Gen</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Water ATM -->
+    <div class="project-card" data-cat="govt">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(59,130,246,0.15);">💧</div>
+          <div class="project-badges">
+            <span class="project-badge badge-store">▶ Play Store</span>
+            <span class="project-badge badge-govt">Govt. Project</span>
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">APDP Water ATM</div>
+        <div class="project-desc">QR-based payment system for citizens to purchase water from automated government water booths with live operator dashboards.</div>
+        <div class="project-features">
+          <span class="feature-chip">QR Scan Pay</span><span class="feature-chip">Digital Wallet</span><span class="feature-chip">Revenue Dashboard</span><span class="feature-chip">Transaction History</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">QR Scanner</span><span class="tech-tag">Firebase</span><span class="tech-tag">REST API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saras -->
+    <div class="project-card" data-cat="govt">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(16,185,129,0.15);">🥛</div>
+          <div class="project-badges">
+            <span class="project-badge badge-store">▶ Play Store</span>
+            <span class="project-badge badge-govt">Govt. Initiative</span>
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">Saras Marketing — Dairy Mgmt</div>
+        <div class="project-desc">Field attendance and GPS route monitoring for Ajmera Dairy under Saras government initiative with automated daily reports.</div>
+        <div class="project-features">
+          <span class="feature-chip">GPS Tracking</span><span class="feature-chip">Attendance</span><span class="feature-chip">Order Mgmt</span><span class="feature-chip">Auto Reports</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">GPS</span><span class="tech-tag">Firebase</span><span class="tech-tag">REST API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Water Tanker -->
+    <div class="project-card" data-cat="govt">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(14,165,233,0.15);">🚛</div>
+          <div class="project-badges">
+            <span class="project-badge badge-govt">Govt. Project</span>
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">Water Tanker Management</div>
+        <div class="project-desc">Complete platform for citizen water tanker booking with live GPS tracking, dispatch coordination and automated invoicing.</div>
+        <div class="project-features">
+          <span class="feature-chip">Live GPS</span><span class="feature-chip">Citizen Booking</span><span class="feature-chip">Auto Invoice</span><span class="feature-chip">Dispatch</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">GPS</span><span class="tech-tag">Firebase</span><span class="tech-tag">REST API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sofo -->
+    <div class="project-card" data-cat="ecommerce">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(244,63,94,0.15);">🛒</div>
+          <div class="project-badges">
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">Sofo — E-Commerce Marketplace</div>
+        <div class="project-desc">Complete shopping platform with smart search, geo-based delivery, real-time order tracking and personalized shopping flows.</div>
+        <div class="project-features">
+          <span class="feature-chip">Smart Search</span><span class="feature-chip">Geo Delivery</span><span class="feature-chip">Order Tracking</span><span class="feature-chip">COD + Online</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">Razorpay</span><span class="tech-tag">REST API</span><span class="tech-tag">Firebase</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- International Ecommerce -->
+    <div class="project-card" data-cat="ecommerce">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(99,102,241,0.15);">🌍</div>
+          <div class="project-badges">
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">International E-Commerce + Stripe</div>
+        <div class="project-desc">Full international e-commerce platform with Stripe payment gateway for secure cross-border payment processing.</div>
+        <div class="project-features">
+          <span class="feature-chip">Stripe Payments</span><span class="feature-chip">Cross-border</span><span class="feature-chip">Order Lifecycle</span><span class="feature-chip">Wishlist</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">Stripe</span><span class="tech-tag">REST API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <div class="project-card" data-cat="ai">
+      <div class="project-card-inner">
+        <div class="project-header">
+          <div class="project-icon" style="background:rgba(139,92,246,0.15);">🤖</div>
+          <div class="project-badges">
+            <span class="project-badge badge-solo">Solo Dev</span>
+          </div>
+        </div>
+        <div class="project-name">AI Chatbot — OpenAI Integration</div>
+        <div class="project-desc">Production app with integrated OpenAI ChatGPT API for AI-powered conversational customer support and automated interactions.</div>
+        <div class="project-features">
+          <span class="feature-chip">ChatGPT API</span><span class="feature-chip">AI Responses</span><span class="feature-chip">Auto Support</span><span class="feature-chip">Real-time</span>
+        </div>
+        <div class="project-tech">
+          <span class="tech-tag">Flutter</span><span class="tech-tag">OpenAI API</span><span class="tech-tag">Firebase</span><span class="tech-tag">REST API</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-eyebrow">// expertise</div>
+  <div class="section-title">Technical Skills</div>
+  <div class="section-sub">Full-stack mobile capabilities — from UI to IoT, payments to AI.</div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-cat">Mobile Development</div>
+      <div class="skill-items">
+        <span class="skill-item highlight">Flutter</span><span class="skill-item highlight">Dart</span><span class="skill-item">Android</span><span class="skill-item">iOS</span><span class="skill-item">Cross-Platform</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">AI & Integrations</div>
+      <div class="skill-items">
+        <span class="skill-item highlight">OpenAI API</span><span class="skill-item highlight">ChatGPT</span><span class="skill-item">REST APIs</span><span class="skill-item">.NET API</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Payments & FinTech</div>
+      <div class="skill-items">
+        <span class="skill-item highlight">Razorpay</span><span class="skill-item highlight">Stripe</span><span class="skill-item">Digital Wallet</span><span class="skill-item">QR Pay</span><span class="skill-item">Mobile Recharge</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Backend & Database</div>
+      <div class="skill-items">
+        <span class="skill-item">Firebase Auth</span><span class="skill-item">Firestore</span><span class="skill-item">Realtime DB</span><span class="skill-item">FCM</span><span class="skill-item">SQL</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">IoT & Hardware</div>
+      <div class="skill-items">
+        <span class="skill-item highlight">Bluetooth BLE</span><span class="skill-item">Encrypted Commands</span><span class="skill-item">IoT Devices</span><span class="skill-item">GPS Tracking</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Govt. & Reporting</div>
+      <div class="skill-items">
+        <span class="skill-item">EXIF Extraction</span><span class="skill-item">PDF Reports</span><span class="skill-item">Excel Sheets</span><span class="skill-item">Live Dashboards</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Currently Learning</div>
+      <div class="skill-items">
+        <span class="skill-item highlight">Java DSA</span><span class="skill-item highlight">Spring Boot</span><span class="skill-item">System Design</span><span class="skill-item">LeetCode</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Tools</div>
+      <div class="skill-items">
+        <span class="skill-item">Git</span><span class="skill-item">GitHub</span><span class="skill-item">Play Store</span><span class="skill-item">App Store</span><span class="skill-item">UI/UX Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section>
+  <div class="section-eyebrow">// highlights</div>
+  <div class="section-title">Achievements</div>
+  <div class="achievements-grid">
+    <div class="ach-card">
+      <div class="ach-icon">🎖️</div>
+      <div>
+        <div class="ach-title">Home Minister Launch</div>
+        <div class="ach-desc">Sweet Exchange app officially launched by Hon. Home Minister Shri Amit Shah — landmark govt. digital transformation.</div>
+      </div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">🏛️</div>
+      <div>
+        <div class="ach-title">Govt. of India — DOT</div>
+        <div class="ach-desc">Currently serving as Software Developer at Department of Telecommunication, Ministry of Communications.</div>
+      </div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">📱</div>
+      <div>
+        <div class="ach-title">10+ Solo Production Apps</div>
+        <div class="ach-desc">Every app built end-to-end solo — architecture, development, testing, and deployment to Play Store & App Store.</div>
+      </div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">🎓</div>
+      <div>
+        <div class="ach-title">B.Tech Distinction — RTU Kota</div>
+        <div class="ach-desc">Computer Science & Engineering with Distinction and zero backlogs — Shankara Institute of Technology, 2025.</div>
+      </div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">🤖</div>
+      <div>
+        <div class="ach-title">AI Integration in Production</div>
+        <div class="ach-desc">Integrated OpenAI ChatGPT API in a live production app — building AI-powered features before it was mainstream.</div>
+      </div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">🏅</div>
+      <div>
+        <div class="ach-title">Accenture Certified</div>
+        <div class="ach-desc">Flutter Developer — Digital Skill: Mobile certification issued by Accenture.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-wrap">
+    <div class="section-eyebrow" style="text-align:center;">// let's connect</div>
+    <div class="contact-title">Open to <span style="background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Product Companies</span></div>
+    <div class="contact-sub">Targeting WFH/Hybrid roles in Gurugram & Remote — Flutter + Java Backend | ₹1L+/month</div>
+    <div class="contact-links">
+      <a href="mailto:csvishal6724@gmail.com" class="contact-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        csvishal6724@gmail.com
+      </a>
+      <a href="tel:+919782691587" class="contact-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 1.18 2 2 0 012.03 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        +91 9782691587
+      </a>
+      <a href="https://www.linkedin.com/in/vishal-singh-a0021726b" target="_blank" class="contact-link">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn Profile
+      </a>
+      <a href="https://github.com/vishalsinghengineer01" target="_blank" class="contact-link">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        GitHub Profile
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Built with ❤️ by Vishal Singh · Flutter Developer · Jaipur / Delhi</div>
+  <div style="margin-top:0.5rem;color:var(--text3);">© 2026 · Open to WFH/Hybrid Product Company Roles</div>
+</footer>
+
+</div>
+
+<script>
+// CURSOR GLOW
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+
+// ANIMATED CANVAS BG
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.5 + 0.5;
+    this.alpha = Math.random() * 0.5 + 0.1;
+    this.color = ['#3b82f6','#6366f1','#8b5cf6','#14b8a6'][Math.floor(Math.random()*4)];
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset();
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+for(let i=0;i<120;i++) particles.push(new Particle());
+
+function drawConnections() {
+  for(let i=0;i<particles.length;i++) {
+    for(let j=i+1;j<particles.length;j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx*dx+dy*dy);
+      if(d<120) {
+        ctx.save();
+        ctx.globalAlpha = (1-d/120)*0.12;
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw();});
+  drawConnections();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// SCROLL REVEAL
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if(entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, {threshold: 0.1});
+
+document.querySelectorAll('.stat-card,.exp-item,.project-card,.skill-card,.ach-card').forEach(el => observer.observe(el));
+
+// PROJECT FILTER
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.project-card').forEach(card => {
+      if(filter==='all' || card.dataset.cat===filter) {
+        card.style.display='block';
+        setTimeout(()=>card.classList.add('visible'),50);
+      } else {
+        card.style.display='none';
+        card.classList.remove('visible');
+      }
+    });
+  });
+});
+
+// SMOOTH NAV
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+  });
+});
+
+// NAV ACTIVE
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.background = window.scrollY > 50 ? 'rgba(5,8,16,0.95)' : 'rgba(5,8,16,0.7)';
+});
+</script>
+</body>
+</html>
