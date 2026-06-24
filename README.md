@@ -2,7 +2,7 @@
 Flutter Developer Portfolio | 10+ Production Apps | Govt. of India | DOT | Solo Developer
 # Vishal Singh — Flutter Developer
 
-🔗 **Live Portfolio:** https://vishalsinghengineer01.github.io
+🔗 **Live Portfolio:** https://vishalsinghengineer01.github.io/github.io/
 
 ## About
 Flutter Developer | 2+ Years | 10+ Solo Production Apps
