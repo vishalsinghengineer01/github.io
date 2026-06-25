@@ -3,700 +3,1096 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vishal Singh — Flutter Developer | Govt. of India</title>
-<meta name="description" content="Vishal Singh — Flutter Developer with 2+ years experience. 10+ production apps, Government of India deployments, DOT, AI integration. Targeting product companies.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>Vishal Singh — Flutter Developer</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#03050f;--bg2:#070b18;--card:rgba(13,20,40,0.8);
-  --blue:#3b82f6;--indigo:#6366f1;--purple:#8b5cf6;--cyan:#06b6d4;
-  --teal:#14b8a6;--green:#10b981;--amber:#f59e0b;--pink:#ec4899;
-  --text:#f0f4ff;--text2:#8892b0;--text3:#4a5568;
-  --border:rgba(255,255,255,0.06);--glass:rgba(255,255,255,0.03);
+  --bg:#020408;--indigo:#6366f1;--purple:#8b5cf6;--blue:#3b82f6;
+  --cyan:#06b6d4;--green:#10b981;--amber:#f59e0b;--pink:#ec4899;
+  --text:#f0f4ff;--text2:#8892b0;--text3:#374151;
+  --border:rgba(255,255,255,0.06);--card:rgba(10,15,30,0.85);
 }
 html{scroll-behavior:smooth;overflow-x:hidden;}
 body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
 
-/* CUSTOM CURSOR */
-.cursor{position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:difference;}
-.cursor-dot{width:8px;height:8px;background:white;border-radius:50%;position:fixed;transform:translate(-50%,-50%);transition:width .2s,height .2s;}
-.cursor-ring{width:40px;height:40px;border:1px solid rgba(255,255,255,0.5);border-radius:50%;position:fixed;transform:translate(-50%,-50%);transition:all .15s ease;pointer-events:none;}
-.cursor-ring.hovering{width:60px;height:60px;border-color:var(--indigo);background:rgba(99,102,241,0.1);}
+/* CURSOR */
+#cdot{position:fixed;width:6px;height:6px;background:white;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s;}
+#cring{position:fixed;width:36px;height:36px;border:1px solid rgba(99,102,241,0.6);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s,background .2s;}
+#cring.h{width:56px;height:56px;border-color:var(--purple);background:rgba(139,92,246,0.08);}
 
-/* THREE.JS CANVAS */
-#three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.7;}
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:8000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;}
+.ld-logo{font-family:'JetBrains Mono',monospace;font-size:clamp(1.2rem,3vw,2rem);color:var(--indigo);letter-spacing:0.3em;opacity:0;animation:fadeIn 0.5s 0.2s forwards;}
+.ld-bar-wrap{width:280px;height:1.5px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+.ld-bar{height:100%;background:linear-gradient(90deg,var(--indigo),var(--cyan),var(--purple));width:0%;transition:width 0.1s linear;}
+.ld-pct{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2);letter-spacing:0.1em;}
+.ld-msg{font-size:0.72rem;color:var(--text3);letter-spacing:0.15em;font-family:'JetBrains Mono',monospace;}
+
+/* 3D CANVAS - FULLSCREEN */
+#hero-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;}
 
 /* NOISE */
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.5;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.6;}
 
-.content{position:relative;z-index:2;}
-
-/* LOADING SCREEN */
-#loader{position:fixed;inset:0;background:var(--bg);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;}
-.loader-text{font-family:'JetBrains Mono',monospace;font-size:clamp(1rem,3vw,1.5rem);color:var(--indigo);letter-spacing:0.3em;}
-.loader-bar-wrap{width:300px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
-.loader-bar{height:100%;background:linear-gradient(90deg,var(--indigo),var(--cyan));width:0%;transition:width 0.1s;}
-.loader-pct{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text2);}
+.page{position:relative;z-index:2;}
 
 /* NAV */
-nav{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%);z-index:1000;background:rgba(7,11,24,0.7);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:100px;padding:0.6rem 1.5rem;display:flex;align-items:center;gap:2rem;opacity:0;}
-.nav-logo{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--indigo);white-space:nowrap;}
+nav{position:fixed;top:1.2rem;left:50%;transform:translateX(-50%);z-index:1000;
+  background:rgba(2,4,8,0.6);backdrop-filter:blur(24px);
+  border:1px solid var(--border);border-radius:100px;
+  padding:0.55rem 1.4rem;display:flex;align-items:center;gap:2rem;
+  opacity:0;white-space:nowrap;}
+.nav-logo{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--indigo);}
 .nav-links{display:flex;gap:1.5rem;}
-.nav-links a{color:var(--text2);text-decoration:none;font-size:0.8rem;font-weight:500;transition:color 0.2s;white-space:nowrap;}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.78rem;font-weight:500;transition:color .2s;}
 .nav-links a:hover{color:var(--text);}
-.nav-hire{background:linear-gradient(135deg,var(--indigo),var(--purple));padding:0.4rem 1.1rem;border-radius:100px;color:white!important;font-size:0.78rem!important;font-weight:600!important;}
+.nav-hire{background:linear-gradient(135deg,var(--indigo),var(--purple));
+  padding:0.38rem 1.1rem;border-radius:100px;color:white!important;
+  font-size:0.75rem!important;font-weight:600!important;text-decoration:none;}
 
-/* HERO */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden;}
-.hero-inner{text-align:center;max-width:900px;}
-.hero-status{display:inline-flex;align-items:center;gap:0.6rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);padding:0.4rem 1.2rem;border-radius:100px;font-size:0.75rem;color:var(--green);font-family:'JetBrains Mono',monospace;margin-bottom:2rem;letter-spacing:0.05em;}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
-.hero-pre{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--indigo);letter-spacing:0.2em;margin-bottom:1rem;opacity:0;}
-.hero-name{font-size:clamp(3.5rem,10vw,7rem);font-weight:700;line-height:0.95;margin-bottom:1.5rem;opacity:0;}
-.hero-name .line1{display:block;color:var(--text);}
-.hero-name .line2{display:block;background:linear-gradient(135deg,var(--blue) 0%,var(--indigo) 40%,var(--purple) 70%,var(--pink) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hero-desc{font-size:clamp(0.95rem,2vw,1.15rem);color:var(--text2);line-height:1.8;max-width:650px;margin:0 auto 2.5rem;opacity:0;}
-.hero-desc span{color:var(--cyan);font-weight:500;}
-.hero-tags{display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin-bottom:3rem;opacity:0;}
-.hero-tag{background:var(--glass);border:1px solid var(--border);padding:0.35rem 0.9rem;border-radius:8px;font-size:0.72rem;color:var(--text2);backdrop-filter:blur(10px);transition:all 0.2s;}
-.hero-tag:hover{border-color:rgba(99,102,241,0.4);color:var(--text);}
-.hero-tag.gold{border-color:rgba(245,158,11,0.4);color:var(--amber);background:rgba(245,158,11,0.05);}
-.hero-tag.green{border-color:rgba(16,185,129,0.4);color:var(--green);background:rgba(16,185,129,0.05);}
-.hero-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;}
-.btn-glow{background:linear-gradient(135deg,var(--indigo),var(--purple));padding:0.9rem 2.2rem;border-radius:12px;color:white;text-decoration:none;font-weight:600;font-size:0.9rem;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;display:flex;align-items:center;gap:0.5rem;}
-.btn-glow::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--purple),var(--pink));opacity:0;transition:opacity 0.3s;}
-.btn-glow:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(139,92,246,0.5);}
-.btn-glow:hover::before{opacity:1;}
-.btn-glow span{position:relative;z-index:1;}
-.btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.15);padding:0.9rem 2.2rem;border-radius:12px;color:var(--text2);text-decoration:none;font-weight:500;font-size:0.9rem;transition:all 0.2s;display:flex;align-items:center;gap:0.5rem;backdrop-filter:blur(10px);}
-.btn-outline:hover{border-color:var(--indigo);color:var(--text);background:rgba(99,102,241,0.08);}
-.scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.75rem;opacity:0;animation:fadeIn 1s 3s forwards;}
-.scroll-mouse{width:24px;height:38px;border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;position:relative;}
-.scroll-wheel{width:3px;height:8px;background:var(--indigo);border-radius:2px;position:absolute;top:6px;left:50%;transform:translateX(-50%);animation:scrollDown 2s infinite;}
-.scroll-text{font-size:0.65rem;color:var(--text3);letter-spacing:0.15em;font-family:'JetBrains Mono',monospace;}
+/* HERO SECTION */
+.hero{height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:0 2rem;position:relative;overflow:hidden;}
+.hero-content{text-align:center;position:relative;z-index:3;}
+.hero-status{display:inline-flex;align-items:center;gap:0.5rem;
+  background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);
+  padding:0.35rem 1rem;border-radius:100px;font-size:0.7rem;color:var(--green);
+  font-family:'JetBrains Mono',monospace;margin-bottom:1.8rem;letter-spacing:0.05em;}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.hero-pre{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--indigo);
+  letter-spacing:0.25em;margin-bottom:1rem;opacity:0;}
+.hero-name{font-size:clamp(4rem,12vw,8rem);font-weight:700;line-height:0.9;
+  margin-bottom:1.5rem;opacity:0;letter-spacing:-0.02em;}
+.hn1{display:block;color:var(--text);}
+.hn2{display:block;background:linear-gradient(135deg,var(--blue),var(--indigo),var(--purple),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  background-size:300%;animation:gradShift 4s ease infinite;}
+.hero-sub{font-size:clamp(0.9rem,2vw,1.1rem);color:var(--text2);line-height:1.8;
+  max-width:580px;margin:0 auto 2.5rem;opacity:0;}
+.hero-sub em{color:var(--cyan);font-style:normal;font-weight:500;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-bottom:2.5rem;opacity:0;}
+.hpill{background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  padding:0.3rem 0.85rem;border-radius:8px;font-size:0.7rem;color:var(--text2);
+  backdrop-filter:blur(8px);transition:all .2s;}
+.hpill.gold{border-color:rgba(245,158,11,0.35);color:var(--amber);background:rgba(245,158,11,0.05);}
+.hpill.green{border-color:rgba(16,185,129,0.35);color:var(--green);background:rgba(16,185,129,0.05);}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;}
+.btn-p{background:linear-gradient(135deg,var(--indigo),var(--purple));
+  padding:0.85rem 2rem;border-radius:12px;color:white;text-decoration:none;
+  font-weight:600;font-size:0.88rem;transition:transform .2s,box-shadow .2s;
+  display:inline-flex;align-items:center;gap:0.4rem;position:relative;overflow:hidden;}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(139,92,246,0.45);}
+.btn-s{background:transparent;border:1px solid rgba(255,255,255,0.12);
+  padding:0.85rem 2rem;border-radius:12px;color:var(--text2);text-decoration:none;
+  font-weight:500;font-size:0.88rem;transition:all .2s;backdrop-filter:blur(10px);}
+.btn-s:hover{border-color:var(--indigo);color:var(--text);}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0.6rem;opacity:0;}
+.smouse{width:22px;height:34px;border:1.5px solid rgba(255,255,255,0.18);border-radius:11px;position:relative;}
+.swheel{width:3px;height:6px;background:var(--indigo);border-radius:2px;
+  position:absolute;top:5px;left:50%;transform:translateX(-50%);animation:sw 2s infinite;}
+.stxt{font-size:0.6rem;color:var(--text3);letter-spacing:0.2em;font-family:'JetBrains Mono',monospace;}
 
-/* STATS MARQUEE */
-.marquee-wrap{padding:2rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;background:rgba(7,11,24,0.5);}
-.marquee-track{display:flex;gap:4rem;animation:marquee 20s linear infinite;width:max-content;}
-.marquee-item{display:flex;align-items:center;gap:0.75rem;white-space:nowrap;font-size:0.85rem;color:var(--text2);}
-.marquee-item strong{color:var(--text);font-weight:600;}
-.marquee-dot{width:4px;height:4px;border-radius:50%;background:var(--indigo);}
+/* MARQUEE */
+.marquee-sec{padding:1.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;background:rgba(2,4,8,0.7);position:relative;z-index:3;}
+.mtrack{display:flex;gap:3.5rem;animation:marquee 25s linear infinite;width:max-content;}
+.mitem{display:flex;align-items:center;gap:0.6rem;font-size:0.82rem;color:var(--text2);white-space:nowrap;}
+.mitem strong{color:var(--text);}
+.mdot{width:3px;height:3px;border-radius:50%;background:var(--indigo);flex-shrink:0;}
 
-/* SECTIONS */
-section{padding:7rem 2rem;max-width:1100px;margin:0 auto;}
-.sec-label{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--indigo);letter-spacing:0.25em;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.75rem;}
-.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--indigo),transparent);max-width:100px;}
-.sec-title{font-size:clamp(2rem,5vw,3rem);font-weight:700;line-height:1.1;margin-bottom:1rem;}
-.sec-sub{color:var(--text2);font-size:0.95rem;line-height:1.8;max-width:560px;margin-bottom:4rem;}
+/* CONTENT SECTIONS */
+.sections{position:relative;z-index:3;background:linear-gradient(to bottom,transparent,var(--bg) 5%);}
+section{padding:6rem 2rem;max-width:1100px;margin:0 auto;}
+.sl{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--indigo);
+  letter-spacing:0.25em;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.6rem;}
+.sl::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--indigo),transparent);max-width:80px;}
+.st{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;line-height:1.1;margin-bottom:0.75rem;}
+.ss{color:var(--text2);font-size:0.9rem;line-height:1.8;max-width:520px;margin-bottom:3.5rem;}
 
-/* ABOUT / BENTO */
-.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:1rem;}
-.bento-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.5rem;backdrop-filter:blur(20px);transition:border-color 0.3s,transform 0.3s;overflow:hidden;position:relative;}
-.bento-card:hover{border-color:rgba(99,102,241,0.3);transform:translateY(-4px);}
-.bento-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,0.05),transparent);opacity:0;transition:opacity 0.3s;border-radius:20px;}
-.bento-card:hover::before{opacity:1;}
-.bc-1{grid-column:span 8;}
-.bc-2{grid-column:span 4;}
-.bc-3{grid-column:span 4;}
-.bc-4{grid-column:span 4;}
-.bc-5{grid-column:span 4;}
-.bc-6{grid-column:span 6;}
-.bc-7{grid-column:span 6;}
-.bento-icon{font-size:2rem;margin-bottom:1rem;}
-.bento-title{font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;}
-.bento-desc{font-size:0.82rem;color:var(--text2);line-height:1.7;}
-.bento-num{font-size:3rem;font-weight:700;background:linear-gradient(135deg,var(--blue),var(--indigo));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
-.bento-num-label{font-size:0.75rem;color:var(--text2);margin-top:0.25rem;}
-.code-block{background:rgba(0,0,0,0.4);border-radius:10px;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text2);margin-top:0.75rem;border:1px solid rgba(255,255,255,0.05);}
-.code-line{margin-bottom:0.3rem;}
-.code-kw{color:#c792ea;}.code-fn{color:#82aaff;}.code-str{color:#c3e88d;}.code-cm{color:#546e7a;}
+/* BENTO ABOUT */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:0.85rem;}
+.bc{background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:1.4rem;backdrop-filter:blur(20px);transition:border-color .3s,transform .3s;
+  position:relative;overflow:hidden;}
+.bc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,0.05),transparent);
+  opacity:0;transition:opacity .3s;border-radius:18px;pointer-events:none;}
+.bc:hover{border-color:rgba(99,102,241,0.3);transform:translateY(-4px);}
+.bc:hover::after{opacity:1;}
+.bc1{grid-column:span 8;}
+.bc2{grid-column:span 4;display:flex;flex-direction:column;justify-content:center;text-align:center;}
+.bc3,.bc4,.bc5{grid-column:span 4;text-align:center;}
+.bc6,.bc7{grid-column:span 6;}
+.bico{font-size:1.8rem;margin-bottom:0.85rem;}
+.btt{font-size:1rem;font-weight:600;margin-bottom:0.4rem;}
+.bds{font-size:0.8rem;color:var(--text2);line-height:1.7;}
+.bnum{font-size:2.8rem;font-weight:700;background:linear-gradient(135deg,var(--blue),var(--indigo));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.bnl{font-size:0.72rem;color:var(--text2);margin-top:0.2rem;}
+.codeblk{background:rgba(0,0,0,0.5);border-radius:8px;padding:0.85rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text2);
+  margin-top:0.75rem;border:1px solid rgba(255,255,255,0.04);line-height:1.8;}
+.ck{color:#c792ea;}.cf{color:#82aaff;}.cs{color:#c3e88d;}.cc{color:#546e7a;}
 
-/* EXPERIENCE TIMELINE */
-.timeline{position:relative;padding-left:2rem;}
-.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--indigo),var(--purple),transparent);}
-.tl-item{position:relative;margin-bottom:3rem;opacity:0;transform:translateX(-30px);transition:all 0.7s;}
-.tl-item.vis{opacity:1;transform:translateX(0);}
-.tl-dot{position:absolute;left:-2.35rem;top:4px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--purple));box-shadow:0 0 20px rgba(99,102,241,0.6);border:2px solid var(--bg);}
-.tl-dot.current{animation:dotPulse 2s infinite;}
-.tl-period{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--indigo);letter-spacing:0.1em;margin-bottom:0.4rem;}
-.tl-role{font-size:1.15rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;}
-.tl-co{font-size:0.85rem;color:var(--cyan);font-weight:500;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;}
-.tl-co-badge{font-size:0.65rem;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--green);padding:0.15rem 0.6rem;border-radius:100px;}
-.tl-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;backdrop-filter:blur(20px);}
-.tl-bullets{list-style:none;}
-.tl-bullets li{font-size:0.82rem;color:var(--text2);padding:0.3rem 0;padding-left:1rem;position:relative;line-height:1.6;}
-.tl-bullets li::before{content:'▸';position:absolute;left:0;color:var(--indigo);}
-.tl-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;}
-.tl-tag{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--purple);background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);padding:0.2rem 0.6rem;border-radius:6px;}
+/* TIMELINE */
+.tl{position:relative;padding-left:2rem;}
+.tl::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,var(--indigo),var(--purple),transparent);}
+.tli{position:relative;margin-bottom:2.5rem;opacity:0;transform:translateX(-25px);transition:all .6s;}
+.tli.v{opacity:1;transform:translateX(0);}
+.tldot{position:absolute;left:-2.3rem;top:5px;width:12px;height:12px;border-radius:50%;
+  background:linear-gradient(135deg,var(--indigo),var(--purple));
+  box-shadow:0 0 16px rgba(99,102,241,0.5);border:2px solid var(--bg);}
+.tldot.cur{animation:dp 2s infinite;}
+.tlp{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--indigo);letter-spacing:0.08em;margin-bottom:0.3rem;}
+.tlr{font-size:1.1rem;font-weight:600;margin-bottom:0.12rem;}
+.tlc{font-size:0.82rem;color:var(--cyan);font-weight:500;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem;}
+.tlcb{font-size:0.62rem;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);color:var(--green);padding:0.12rem 0.55rem;border-radius:100px;}
+.tlcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem;backdrop-filter:blur(16px);}
+.tlul{list-style:none;}
+.tlul li{font-size:0.8rem;color:var(--text2);padding:0.25rem 0 0.25rem 1rem;position:relative;line-height:1.6;}
+.tlul li::before{content:'▸';position:absolute;left:0;color:var(--indigo);}
+.tltags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.65rem;}
+.tltag{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--purple);
+  background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);
+  padding:0.18rem 0.55rem;border-radius:5px;}
 
 /* PROJECTS */
-.proj-filter{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:2.5rem;}
-.pf-btn{background:transparent;border:1px solid var(--border);padding:0.4rem 1rem;border-radius:100px;font-size:0.78rem;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:'Space Grotesk',sans-serif;}
-.pf-btn.on,.pf-btn:hover{background:linear-gradient(135deg,var(--indigo),var(--purple));border-color:transparent;color:white;}
-.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;}
-.proj-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;transition:all 0.35s;position:relative;overflow:hidden;backdrop-filter:blur(20px);opacity:0;transform:translateY(30px);}
-.proj-card.vis{opacity:1;transform:translateY(0);}
-.proj-card:hover{transform:translateY(-8px);border-color:rgba(99,102,241,0.4);box-shadow:0 30px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(99,102,241,0.1);}
-.proj-glow{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center,rgba(99,102,241,0.08),transparent 70%);opacity:0;transition:opacity 0.3s;pointer-events:none;}
-.proj-card:hover .proj-glow{opacity:1;}
-.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;}
-.proj-emoji{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
-.proj-bdgs{display:flex;flex-direction:column;gap:0.3rem;align-items:flex-end;}
-.pbdg{font-size:0.62rem;padding:0.2rem 0.6rem;border-radius:100px;font-weight:600;}
-.pbdg-g{background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);}
-.pbdg-b{background:rgba(59,130,246,0.12);color:var(--blue);border:1px solid rgba(59,130,246,0.25);}
-.pbdg-p{background:rgba(139,92,246,0.12);color:var(--purple);border:1px solid rgba(139,92,246,0.25);}
-.pbdg-a{background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.25);}
-.proj-name{font-size:1rem;font-weight:600;margin-bottom:0.35rem;color:var(--text);}
-.proj-desc{font-size:0.8rem;color:var(--text2);line-height:1.65;margin-bottom:0.85rem;}
-.proj-chips{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.85rem;}
-.chip{background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:0.18rem 0.55rem;border-radius:5px;font-size:0.67rem;color:var(--text3);}
-.proj-tech{display:flex;flex-wrap:wrap;gap:0.35rem;}
-.ptag{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--teal);background:rgba(20,184,166,0.08);border:1px solid rgba(20,184,166,0.18);padding:0.18rem 0.5rem;border-radius:5px;}
+.pf{display:flex;gap:0.55rem;flex-wrap:wrap;margin-bottom:2rem;}
+.pfb{background:transparent;border:1px solid var(--border);padding:0.35rem 0.9rem;
+  border-radius:100px;font-size:0.76rem;color:var(--text2);cursor:none;
+  transition:all .2s;font-family:'Space Grotesk',sans-serif;}
+.pfb.on,.pfb:hover{background:linear-gradient(135deg,var(--indigo),var(--purple));border-color:transparent;color:white;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:0.85rem;}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:1.3rem;transition:all .35s;position:relative;overflow:hidden;
+  backdrop-filter:blur(16px);opacity:0;transform:translateY(25px);}
+.pcard.v{opacity:1;transform:translateY(0);}
+.pcard:hover{transform:translateY(-7px);border-color:rgba(99,102,241,0.35);
+  box-shadow:0 25px 50px rgba(0,0,0,0.5),0 0 0 1px rgba(99,102,241,0.08);}
+.pglow{position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(99,102,241,0.07),transparent 70%);
+  opacity:0;transition:opacity .3s;pointer-events:none;}
+.pcard:hover .pglow{opacity:1;}
+.ptop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.85rem;}
+.pico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.pbdgs{display:flex;flex-direction:column;gap:0.25rem;align-items:flex-end;}
+.pb{font-size:0.6rem;padding:0.18rem 0.55rem;border-radius:100px;font-weight:600;}
+.pbg{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.22);}
+.pbb{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.22);}
+.pbp{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.22);}
+.pba{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.22);}
+.pn{font-size:0.95rem;font-weight:600;margin-bottom:0.3rem;}
+.pd{font-size:0.78rem;color:var(--text2);line-height:1.6;margin-bottom:0.75rem;}
+.pchips{display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.7rem;}
+.chip{background:rgba(255,255,255,0.025);border:1px solid var(--border);
+  padding:0.15rem 0.5rem;border-radius:5px;font-size:0.64rem;color:var(--text3);}
+.ptechs{display:flex;flex-wrap:wrap;gap:0.3rem;}
+.ptag{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--teal,#14b8a6);
+  background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.16);
+  padding:0.15rem 0.45rem;border-radius:4px;}
 
 /* SKILLS */
-.skills-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.85rem;}
-.sk-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;backdrop-filter:blur(20px);opacity:0;transform:translateY(20px);transition:all 0.5s;}
-.sk-card.vis{opacity:1;transform:translateY(0);}
-.sk-card:hover{border-color:rgba(99,102,241,0.3);}
-.sk-cat{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--indigo);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.85rem;font-weight:500;}
-.sk-items{display:flex;flex-wrap:wrap;gap:0.45rem;}
-.sk-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:0.28rem 0.7rem;border-radius:8px;font-size:0.75rem;color:var(--text2);transition:all 0.2s;}
-.sk-item:hover{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--text);}
-.sk-item.hi{background:rgba(20,184,166,0.08);border-color:rgba(20,184,166,0.25);color:var(--teal);}
-.sk-item.ai{background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.25);color:var(--purple);}
+.skgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0.8rem;}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:15px;
+  padding:1.1rem;backdrop-filter:blur(16px);opacity:0;transform:translateY(18px);transition:all .5s;}
+.scard.v{opacity:1;transform:translateY(0);}
+.scard:hover{border-color:rgba(99,102,241,0.28);}
+.scat{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--indigo);
+  text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.75rem;}
+.sitems{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.si{background:rgba(255,255,255,0.025);border:1px solid var(--border);
+  padding:0.25rem 0.65rem;border-radius:7px;font-size:0.73rem;color:var(--text2);transition:all .2s;}
+.si:hover{background:rgba(99,102,241,0.09);border-color:rgba(99,102,241,0.28);color:var(--text);}
+.si.hi{background:rgba(20,184,166,0.07);border-color:rgba(20,184,166,0.22);color:#14b8a6;}
+.si.ai{background:rgba(139,92,246,0.07);border-color:rgba(139,92,246,0.22);color:var(--purple);}
 
-/* ACHIEVEMENTS */
-.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.85rem;}
-.ach-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;display:flex;gap:1rem;align-items:flex-start;backdrop-filter:blur(20px);opacity:0;transform:translateY(20px);transition:all 0.5s;}
-.ach-card.vis{opacity:1;transform:translateY(0);}
-.ach-card:hover{border-color:rgba(245,158,11,0.3);transform:translateY(-4px);}
-.ach-ico{font-size:1.8rem;flex-shrink:0;}
-.ach-t{font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;}
-.ach-d{font-size:0.77rem;color:var(--text2);line-height:1.6;}
+/* ACH */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0.8rem;}
+.acard{background:var(--card);border:1px solid var(--border);border-radius:15px;
+  padding:1.3rem;display:flex;gap:0.85rem;backdrop-filter:blur(16px);
+  opacity:0;transform:translateY(18px);transition:all .5s;}
+.acard.v{opacity:1;transform:translateY(0);}
+.acard:hover{border-color:rgba(245,158,11,0.28);transform:translateY(-4px);}
+.aico{font-size:1.6rem;flex-shrink:0;}
+.at{font-size:0.85rem;font-weight:600;margin-bottom:0.25rem;}
+.ad{font-size:0.74rem;color:var(--text2);line-height:1.6;}
+
+/* TARGET COMPANIES */
+.companies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.85rem;margin-bottom:3rem;}
+.co-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.2rem;text-align:center;backdrop-filter:blur(16px);
+  transition:all .3s;opacity:0;transform:translateY(20px);}
+.co-card.v{opacity:1;transform:translateY(0);}
+.co-card:hover{transform:translateY(-5px);border-color:rgba(99,102,241,0.3);}
+.co-emoji{font-size:2rem;margin-bottom:0.6rem;}
+.co-name{font-size:0.9rem;font-weight:600;margin-bottom:0.2rem;}
+.co-when{font-size:0.68rem;color:var(--indigo);font-family:'JetBrains Mono',monospace;margin-bottom:0.3rem;}
+.co-sal{font-size:0.72rem;color:var(--green);}
 
 /* CONTACT */
-.contact-box{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:4rem 3rem;text-align:center;position:relative;overflow:hidden;backdrop-filter:blur(20px);}
-.contact-box::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:1px;background:linear-gradient(to right,transparent,var(--indigo),var(--purple),transparent);}
-.contact-orb{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,rgba(99,102,241,0.12),transparent 70%);pointer-events:none;}
-.contact-title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700;margin-bottom:0.75rem;}
-.contact-sub{color:var(--text2);font-size:0.9rem;margin-bottom:2.5rem;line-height:1.7;}
-.contact-links{display:flex;flex-wrap:wrap;gap:0.85rem;justify-content:center;}
-.clink{display:flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:0.75rem 1.4rem;border-radius:12px;color:var(--text2);text-decoration:none;font-size:0.82rem;transition:all 0.2s;backdrop-filter:blur(10px);}
-.clink:hover{border-color:var(--indigo);color:var(--text);background:rgba(99,102,241,0.08);transform:translateY(-2px);}
-.clink svg{width:16px;height:16px;flex-shrink:0;}
+.cbox{background:var(--card);border:1px solid var(--border);border-radius:24px;
+  padding:4rem 3rem;text-align:center;position:relative;overflow:hidden;backdrop-filter:blur(20px);}
+.cbox::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:60%;height:1px;background:linear-gradient(to right,transparent,var(--indigo),var(--purple),transparent);}
+.corb{position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  width:400px;height:400px;background:radial-gradient(circle,rgba(99,102,241,0.1),transparent 70%);pointer-events:none;}
+.ct{font-size:clamp(1.6rem,4vw,2.5rem);font-weight:700;margin-bottom:0.6rem;}
+.cs2{color:var(--text2);font-size:0.88rem;margin-bottom:2rem;line-height:1.7;}
+.clinks{display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;}
+.cl{display:flex;align-items:center;gap:0.5rem;background:rgba(255,255,255,0.025);
+  border:1px solid var(--border);padding:0.7rem 1.3rem;border-radius:11px;
+  color:var(--text2);text-decoration:none;font-size:0.8rem;transition:all .2s;}
+.cl:hover{border-color:var(--indigo);color:var(--text);background:rgba(99,102,241,0.07);transform:translateY(-2px);}
+.cl svg{width:15px;height:15px;flex-shrink:0;}
 
-/* FOOTER */
-footer{text-align:center;padding:2.5rem 2rem;color:var(--text3);font-size:0.75rem;border-top:1px solid var(--border);position:relative;z-index:2;line-height:2;}
+footer{text-align:center;padding:2rem;color:var(--text3);font-size:0.72rem;
+  border-top:1px solid var(--border);position:relative;z-index:3;line-height:2;}
 
-/* BACK TO TOP */
-#btt{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;background:linear-gradient(135deg,var(--indigo),var(--purple));border-radius:12px;border:none;cursor:none;color:white;font-size:1.1rem;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:500;}
-#btt.show{opacity:1;transform:translateY(0);}
-#btt:hover{transform:translateY(-4px);box-shadow:0 0 24px rgba(99,102,241,0.5);}
+/* BTT */
+#btt{position:fixed;bottom:1.8rem;right:1.8rem;width:42px;height:42px;
+  background:linear-gradient(135deg,var(--indigo),var(--purple));border-radius:11px;
+  border:none;cursor:none;color:white;font-size:1rem;display:flex;align-items:center;
+  justify-content:center;opacity:0;transform:translateY(15px);transition:all .3s;z-index:500;}
+#btt.s{opacity:1;transform:translateY(0);}
 
 /* KEYFRAMES */
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);}}
-@keyframes dotPulse{0%,100%{box-shadow:0 0 20px rgba(99,102,241,0.6);}50%{box-shadow:0 0 40px rgba(99,102,241,1),0 0 60px rgba(99,102,241,0.4);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(1.5);}}
+@keyframes dp{0%,100%{box-shadow:0 0 16px rgba(99,102,241,0.5);}50%{box-shadow:0 0 32px rgba(99,102,241,1),0 0 48px rgba(99,102,241,0.3);}}
 @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%)}}
-@keyframes scrollDown{0%{opacity:1;transform:translateX(-50%) translateY(0);}100%{opacity:0;transform:translateX(-50%) translateY(14px);}}
+@keyframes sw{0%{opacity:1;top:5px;}100%{opacity:0;top:18px;}}
+@keyframes gradShift{0%{background-position:0%;}50%{background-position:100%;}100%{background-position:0%;}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-@keyframes float{0%,100%{transform:translateY(0) rotate(0deg);}33%{transform:translateY(-12px) rotate(1deg);}66%{transform:translateY(-6px) rotate(-1deg);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
 
 @media(max-width:768px){
-  nav{padding:0.5rem 1rem;gap:1rem;top:1rem;}
+  nav{padding:0.45rem 1rem;gap:1rem;top:0.8rem;}
   .nav-links{display:none;}
-  .hero{padding:5rem 1.5rem 3rem;}
+  .hero{padding:0 1.5rem;}
   section{padding:4rem 1.5rem;}
   .bento{grid-template-columns:1fr;}
-  .bc-1,.bc-2,.bc-3,.bc-4,.bc-5,.bc-6,.bc-7{grid-column:span 1;}
-  .contact-box{padding:2.5rem 1.5rem;}
+  .bc1,.bc2,.bc3,.bc4,.bc5,.bc6,.bc7{grid-column:span 1;}
+  .cbox{padding:2rem 1.5rem;}
 }
 </style>
 </head>
 <body>
+<div id="cdot"></div>
+<div id="cring"></div>
 
-<!-- CURSOR -->
-<div class="cursor-dot" id="cdot"></div>
-<div class="cursor-ring" id="cring"></div>
-
-<!-- THREE.JS -->
-<canvas id="three-canvas"></canvas>
+<!-- 3D CANVAS -->
+<canvas id="hero-canvas"></canvas>
 
 <!-- LOADER -->
 <div id="loader">
-  <div class="loader-text" id="loader-text">INITIALIZING</div>
-  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
-  <div class="loader-pct" id="loader-pct">0%</div>
+  <div class="ld-logo">VS.DEV</div>
+  <div style="height:0.5rem"></div>
+  <div class="ld-bar-wrap"><div class="ld-bar" id="lbar"></div></div>
+  <div class="ld-pct" id="lpct">0%</div>
+  <div class="ld-msg" id="lmsg">LOADING 3D SCENE</div>
 </div>
 
 <!-- FLOATING NAV -->
-<nav id="mainnav">
-  <div class="nav-logo">vs<span style="color:var(--text3);">.dev</span></div>
+<nav id="nav">
+  <div class="nav-logo">vs<span style="color:rgba(255,255,255,0.2);">.dev</span></div>
   <div class="nav-links">
     <a href="#about">About</a>
     <a href="#experience">Experience</a>
     <a href="#projects">Projects</a>
-    <a href="#skills">Skills</a>
+    <a href="#targets">Targets</a>
     <a href="#contact">Contact</a>
   </div>
   <a href="mailto:csvishal6724@gmail.com" class="nav-hire">Hire Me</a>
 </nav>
 
-<div class="content">
-
+<div class="page">
 <!-- HERO -->
-<div class="hero" id="hero">
-  <div class="hero-inner">
-    <div class="hero-status"><div class="status-dot"></div>Available for opportunities · Jaipur / Delhi</div>
-    <div class="hero-pre" id="hero-pre">// flutter developer & mobile engineer</div>
-    <div class="hero-name" id="hero-name">
-      <span class="line1">Vishal</span>
-      <span class="line2">Singh</span>
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-status"><div class="sdot"></div>Available · Jaipur / Delhi · WFH/Hybrid</div>
+    <div class="hero-pre" id="hpre">// flutter developer & mobile engineer</div>
+    <div class="hero-name" id="hname">
+      <span class="hn1">Vishal</span>
+      <span class="hn2">Singh</span>
     </div>
-    <div class="hero-desc" id="hero-desc">
-      Building <span>production-grade mobile apps</span> used by millions —<br>
-      Government of India • FinTech • IoT • AI Integration
+    <div class="hero-sub" id="hsub">
+      Building <em>production-grade mobile apps</em> used by millions —<br>
+      Govt. of India · FinTech · IoT · AI Integration
     </div>
-    <div class="hero-tags" id="hero-tags">
-      <span class="hero-tag gold">🎖️ App launched by Home Minister Shri Amit Shah</span>
-      <span class="hero-tag green">🏛️ Dept. of Telecommunication, Govt. of India</span>
-      <span class="hero-tag">📱 10+ Solo Production Apps</span>
-      <span class="hero-tag">🤖 OpenAI / ChatGPT Integration</span>
-      <span class="hero-tag">💳 Stripe · Razorpay · Apple Pay</span>
-      <span class="hero-tag">🎓 B.Tech Distinction — RTU Kota 2025</span>
+    <div class="hero-pills" id="hpills">
+      <span class="hpill gold">🎖️ App launched by Home Minister Shri Amit Shah</span>
+      <span class="hpill green">🏛️ Dept. of Telecommunication, Govt. of India</span>
+      <span class="hpill">📱 10+ Solo Production Apps</span>
+      <span class="hpill">🤖 OpenAI ChatGPT Integration</span>
+      <span class="hpill">💳 Stripe · Razorpay · Apple Pay</span>
     </div>
-    <div class="hero-ctas" id="hero-ctas">
-      <a href="#projects" class="btn-glow"><span>View Projects</span></a>
-      <a href="mailto:csvishal6724@gmail.com" class="btn-outline">Get In Touch ↗</a>
+    <div class="hero-btns" id="hbtns">
+      <a href="#projects" class="btn-p">View Projects ↓</a>
+      <a href="mailto:csvishal6724@gmail.com" class="btn-s">Get In Touch ↗</a>
     </div>
   </div>
-  <div class="scroll-hint">
-    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-    <div class="scroll-text">SCROLL</div>
+  <div class="scroll-hint" id="scroll-hint">
+    <div class="smouse"><div class="swheel"></div></div>
+    <div class="stxt">SCROLL</div>
   </div>
 </div>
 
 <!-- MARQUEE -->
-<div class="marquee-wrap">
-  <div class="marquee-track" id="mtrack">
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>10+</strong> Production Apps</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>2+</strong> Years Experience</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Govt. of India</strong> · DOT</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Solo Developer</strong> · All Projects</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Play Store</strong> + App Store</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Stripe · Razorpay · Apple Pay</strong></div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>OpenAI</strong> ChatGPT API</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Bluetooth IoT</strong> · GPS · EXIF</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>B.Tech</strong> Distinction · RTU Kota</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>10+</strong> Production Apps</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>2+</strong> Years Experience</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Govt. of India</strong> · DOT</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Solo Developer</strong> · All Projects</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Play Store</strong> + App Store</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Stripe · Razorpay · Apple Pay</strong></div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>OpenAI</strong> ChatGPT API</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>Bluetooth IoT</strong> · GPS · EXIF</div>
-    <div class="marquee-item"><div class="marquee-dot"></div><strong>B.Tech</strong> Distinction · RTU Kota</div>
+<div class="marquee-sec">
+  <div class="mtrack">
+    <div class="mitem"><div class="mdot"></div><strong>10+</strong>&nbsp;Production Apps</div>
+    <div class="mitem"><div class="mdot"></div><strong>Govt. of India</strong>&nbsp;· DOT</div>
+    <div class="mitem"><div class="mdot"></div><strong>Solo Developer</strong>&nbsp;All Projects</div>
+    <div class="mitem"><div class="mdot"></div><strong>Stripe · Razorpay · Apple Pay</strong></div>
+    <div class="mitem"><div class="mdot"></div><strong>OpenAI</strong>&nbsp;ChatGPT API</div>
+    <div class="mitem"><div class="mdot"></div><strong>Bluetooth IoT</strong>&nbsp;· GPS · EXIF</div>
+    <div class="mitem"><div class="mdot"></div><strong>Play Store</strong>&nbsp;+ App Store</div>
+    <div class="mitem"><div class="mdot"></div><strong>B.Tech Distinction</strong>&nbsp;RTU Kota</div>
+    <div class="mitem"><div class="mdot"></div><strong>10+</strong>&nbsp;Production Apps</div>
+    <div class="mitem"><div class="mdot"></div><strong>Govt. of India</strong>&nbsp;· DOT</div>
+    <div class="mitem"><div class="mdot"></div><strong>Solo Developer</strong>&nbsp;All Projects</div>
+    <div class="mitem"><div class="mdot"></div><strong>Stripe · Razorpay · Apple Pay</strong></div>
+    <div class="mitem"><div class="mdot"></div><strong>OpenAI</strong>&nbsp;ChatGPT API</div>
+    <div class="mitem"><div class="mdot"></div><strong>Bluetooth IoT</strong>&nbsp;· GPS · EXIF</div>
+    <div class="mitem"><div class="mdot"></div><strong>Play Store</strong>&nbsp;+ App Store</div>
+    <div class="mitem"><div class="mdot"></div><strong>B.Tech Distinction</strong>&nbsp;RTU Kota</div>
   </div>
 </div>
 
-<!-- ABOUT BENTO -->
+<div class="sections">
+
+<!-- ABOUT -->
 <section id="about">
-  <div class="sec-label">// about me</div>
-  <div class="sec-title">Who I Am</div>
+  <div class="sl">// about me</div>
+  <div class="st">Who I Am</div>
   <div class="bento">
-    <div class="bento-card bc-1">
-      <div class="bento-icon">👨‍💻</div>
-      <div class="bento-title">Flutter Developer & Mobile Engineer</div>
-      <div class="bento-desc">I build production-grade mobile applications end-to-end — from architecture and UI to backend integration and Play Store deployment. Every app I've shipped was built solo, with complete ownership of the product lifecycle.</div>
-      <div class="code-block">
-        <div class="code-line"><span class="code-cm">// My approach</span></div>
-        <div class="code-line"><span class="code-kw">class</span> <span class="code-fn">VishalSingh</span> <span class="code-kw">extends</span> FlutterDeveloper {</div>
-        <div class="code-line">&nbsp;&nbsp;<span class="code-fn">experience</span> = <span class="code-str">'2+ years'</span>;</div>
-        <div class="code-line">&nbsp;&nbsp;<span class="code-fn">appsBuilt</span> = <span class="code-str">'10+ solo'</span>;</div>
-        <div class="code-line">&nbsp;&nbsp;<span class="code-fn">target</span> = <span class="code-str">'Product companies'</span>;</div>
-        <div class="code-line">}</div>
+    <div class="bc bc1">
+      <div class="bico">👨‍💻</div>
+      <div class="btt">Flutter Developer & Mobile Engineer</div>
+      <div class="bds">I build production-grade mobile apps end-to-end — solo. From architecture and UI to backend integration, payment gateways, IoT, and Play Store deployment. Every app I've shipped was built with complete ownership.</div>
+      <div class="codeblk">
+        <div><span class="cc">// building the future, one app at a time</span></div>
+        <div><span class="ck">class</span> <span class="cf">VishalSingh</span> <span class="ck">extends</span> Developer {</div>
+        <div>&nbsp;&nbsp;<span class="cf">role</span> = <span class="cs">'Flutter Developer'</span>;</div>
+        <div>&nbsp;&nbsp;<span class="cf">apps</span> = <span class="cs">'10+ solo production'</span>;</div>
+        <div>&nbsp;&nbsp;<span class="cf">govt</span> = <span class="cs">'Dept. of Telecommunication'</span>;</div>
+        <div>&nbsp;&nbsp;<span class="cf">target</span> = <span class="cs">'Razorpay / Atlassian'</span>;</div>
+        <div>}</div>
       </div>
     </div>
-    <div class="bento-card bc-2" style="display:flex;flex-direction:column;justify-content:center;text-align:center;">
-      <div class="bento-num">10+</div>
-      <div class="bento-num-label">Production Apps</div>
-      <div style="margin-top:1rem;font-size:0.75rem;color:var(--text3);">All built solo</div>
-    </div>
-    <div class="bento-card bc-3" style="text-align:center;">
-      <div class="bento-num" style="font-size:2rem;">🏛️</div>
-      <div class="bento-title" style="margin-top:0.5rem;">Govt. of India</div>
-      <div class="bento-desc">DOT · RCDF · DIPR · Saras · Water ATM</div>
-    </div>
-    <div class="bento-card bc-4" style="text-align:center;">
-      <div class="bento-num" style="font-size:2rem;">🎖️</div>
-      <div class="bento-title" style="margin-top:0.5rem;">Ministerial Launch</div>
-      <div class="bento-desc">App launched by Hon. Home Minister Shri Amit Shah</div>
-    </div>
-    <div class="bento-card bc-5" style="text-align:center;">
-      <div class="bento-num">2+</div>
-      <div class="bento-num-label">Years Exp.</div>
-    </div>
-    <div class="bento-card bc-6">
-      <div class="bento-icon">💳</div>
-      <div class="bento-title">Payment Expert</div>
-      <div class="bento-desc">Stripe · Razorpay · Apple Pay — international & national payment flows in production.</div>
-    </div>
-    <div class="bento-card bc-7">
-      <div class="bento-icon">🤖</div>
-      <div class="bento-title">AI Integration</div>
-      <div class="bento-desc">OpenAI ChatGPT API integrated in production — AI-powered chatbot serving real users.</div>
-    </div>
+    <div class="bc bc2"><div class="bnum">10+</div><div class="bnl">Production Apps</div><div style="margin-top:.75rem;font-size:.72rem;color:var(--text3)">All built solo</div></div>
+    <div class="bc bc3"><div style="font-size:2rem;">🏛️</div><div class="btt" style="margin-top:.5rem">Govt. of India</div><div class="bds">DOT · RCDF · DIPR · Saras</div></div>
+    <div class="bc bc4"><div style="font-size:2rem;">🎖️</div><div class="btt" style="margin-top:.5rem">Ministerial Launch</div><div class="bds">App by Home Minister Shri Amit Shah</div></div>
+    <div class="bc bc5"><div class="bnum">2+</div><div class="bnl">Years Exp.</div></div>
+    <div class="bc bc6"><div class="bico">💳</div><div class="btt">Multi-Gateway Payments</div><div class="bds">Stripe (international) · Razorpay (national) · Apple Pay — all in live production apps.</div></div>
+    <div class="bc bc7"><div class="bico">🤖</div><div class="btt">AI Integration</div><div class="bds">OpenAI ChatGPT API in production — AI chatbot serving real users at scale.</div></div>
   </div>
 </section>
 
 <!-- EXPERIENCE -->
-<section id="experience" style="max-width:800px;">
-  <div class="sec-label">// career</div>
-  <div class="sec-title">Experience</div>
-  <div class="sec-sub">From Jaipur startups to the Government of India.</div>
-  <div class="timeline">
-    <div class="tl-item">
-      <div class="tl-dot current"></div>
-      <div class="tl-period">NOV 2025 — PRESENT · 8+ MONTHS</div>
-      <div class="tl-role">Software Developer — Telecom & Security</div>
-      <div class="tl-co">🏛️ Department of Telecommunication, Govt. of India · Delhi <span class="tl-co-badge">Current</span></div>
-      <div class="tl-card">
-        <ul class="tl-bullets">
-          <li>Developing secure T&S software systems for India's national telecom infrastructure.</li>
+<section id="experience" style="max-width:780px;">
+  <div class="sl">// career</div>
+  <div class="st">Experience</div>
+  <div class="ss">From Jaipur startups to the Government of India.</div>
+  <div class="tl">
+    <div class="tli">
+      <div class="tldot cur"></div>
+      <div class="tlp">NOV 2025 — PRESENT · 8+ MONTHS</div>
+      <div class="tlr">Software Developer — Telecom & Security</div>
+      <div class="tlc">🏛️ Dept. of Telecommunication, Govt. of India · Delhi<span class="tlcb">Current</span></div>
+      <div class="tlcard">
+        <ul class="tlul">
+          <li>Developing secure T&S systems for India's national telecom infrastructure.</li>
           <li>Contributing to government-grade security protocols and deployment pipelines.</li>
-          <li>Collaborating on critical telecom projects under the Ministry of Communications.</li>
+          <li>Collaborating on critical telecom projects under Ministry of Communications.</li>
         </ul>
-        <div class="tl-tags"><span class="tl-tag">Government</span><span class="tl-tag">Telecom</span><span class="tl-tag">Security</span><span class="tl-tag">National Infrastructure</span></div>
+        <div class="tltags"><span class="tltag">Government</span><span class="tltag">Telecom</span><span class="tltag">Security</span><span class="tltag">National Infrastructure</span></div>
       </div>
     </div>
-    <div class="tl-item">
-      <div class="tl-dot"></div>
-      <div class="tl-period">SEP 2025 — NOV 2025</div>
-      <div class="tl-role">Flutter Developer</div>
-      <div class="tl-co">📦 Kotibox · Jaipur</div>
-      <div class="tl-card">
-        <ul class="tl-bullets">
-          <li>Built Sofo — full e-commerce marketplace with geo-delivery, real-time tracking and Razorpay payments.</li>
-          <li>Developed Magic Wash — vehicle service booking app with live appointment tracking.</li>
-          <li>Created Magic Genie — workforce attendance and task management system.</li>
-          <li>Delivered international e-commerce platform with Stripe cross-border payments.</li>
+    <div class="tli">
+      <div class="tldot"></div>
+      <div class="tlp">SEP 2025 — NOV 2025</div>
+      <div class="tlr">Flutter Developer</div>
+      <div class="tlc">📦 Kotibox · Jaipur</div>
+      <div class="tlcard">
+        <ul class="tlul">
+          <li>Sofo — full e-commerce marketplace with geo-delivery & Razorpay.</li>
+          <li>Magic Wash — vehicle service booking with live tracking.</li>
+          <li>Magic Genie — workforce attendance & task management.</li>
+          <li>International e-commerce with Stripe cross-border payments.</li>
         </ul>
-        <div class="tl-tags"><span class="tl-tag">E-Commerce</span><span class="tl-tag">Stripe</span><span class="tl-tag">Geo-Delivery</span><span class="tl-tag">Workforce</span></div>
+        <div class="tltags"><span class="tltag">E-Commerce</span><span class="tltag">Stripe</span><span class="tltag">GPS</span><span class="tltag">Workforce</span></div>
       </div>
     </div>
-    <div class="tl-item">
-      <div class="tl-dot"></div>
-      <div class="tl-period">JUL 2024 — SEP 2025 · 1 YR 3 MO</div>
-      <div class="tl-role">Flutter Developer</div>
-      <div class="tl-co">🏢 Vedant Infosoft And Solution Pvt. Ltd. · Jaipur</div>
-      <div class="tl-card">
-        <ul class="tl-bullets">
-          <li>RoboTouch — 7-role IoT app (Play Store & App Store) with encrypted Bluetooth BLE, Razorpay, Apple Pay, Stripe, mobile/family/Fastag recharge, Excel reports.</li>
-          <li>Sweet Exchange — officially launched by Hon. Home Minister Shri Amit Shah for RCDF.</li>
-          <li>APDP Water ATM — QR-based govt. water payment system (Play Store).</li>
-          <li>Saras Marketing — GPS attendance & dairy management for Ajmera Dairy (Play Store).</li>
-          <li>DIPR — official govt. field reporting app with EXIF extraction & auto PDF/Excel reports.</li>
-          <li>Water Tanker System — live GPS dispatch platform for government tankers.</li>
+    <div class="tli">
+      <div class="tldot"></div>
+      <div class="tlp">JUL 2024 — SEP 2025 · 1 YR 3 MO</div>
+      <div class="tlr">Flutter Developer</div>
+      <div class="tlc">🏢 Vedant Infosoft · Jaipur</div>
+      <div class="tlcard">
+        <ul class="tlul">
+          <li>RoboTouch — 7-role IoT app (Play Store & App Store) with encrypted BLE, Apple Pay, Stripe, Razorpay, mobile/family/Fastag recharge, Excel reports.</li>
+          <li>Sweet Exchange — launched by Hon. Home Minister Shri Amit Shah for RCDF.</li>
+          <li>APDP Water ATM — QR-based govt. water payment (Play Store).</li>
+          <li>Saras — GPS attendance & dairy management (Play Store).</li>
+          <li>DIPR — govt. field reporting with auto PDF/Excel report generation.</li>
+          <li>Water Tanker System — live GPS govt. dispatch platform.</li>
         </ul>
-        <div class="tl-tags"><span class="tl-tag">IoT Bluetooth</span><span class="tl-tag">Government</span><span class="tl-tag">GPS</span><span class="tl-tag">QR Pay</span><span class="tl-tag">Apple Pay</span><span class="tl-tag">Reports</span></div>
+        <div class="tltags"><span class="tltag">IoT BLE</span><span class="tltag">Apple Pay</span><span class="tltag">Government</span><span class="tltag">GPS</span><span class="tltag">Reports</span></div>
       </div>
     </div>
-    <div class="tl-item">
-      <div class="tl-dot"></div>
-      <div class="tl-period">APR 2024 — JUN 2024 · 3 MONTHS</div>
-      <div class="tl-role">Cross-Platform Developer</div>
-      <div class="tl-co">🌐 WebrockMedia (WRM) · Jaipur</div>
-      <div class="tl-card">
-        <ul class="tl-bullets">
-          <li>Integrated OpenAI ChatGPT API for AI-powered conversational chatbot in production.</li>
-          <li>Built Flutter UI boosting user engagement, Firebase Auth & push notifications.</li>
-          <li>Contributed to YellWish — USA-based Flutter client project.</li>
+    <div class="tli">
+      <div class="tldot"></div>
+      <div class="tlp">APR 2024 — JUN 2024</div>
+      <div class="tlr">Cross-Platform Developer</div>
+      <div class="tlc">🌐 WebrockMedia · Jaipur</div>
+      <div class="tlcard">
+        <ul class="tlul">
+          <li>Integrated OpenAI ChatGPT API — AI chatbot in production app.</li>
+          <li>Firebase Auth, FCM push notifications, 3D animated weather app.</li>
+          <li>YellWish — USA-based Flutter client project.</li>
         </ul>
-        <div class="tl-tags"><span class="tl-tag">OpenAI API</span><span class="tl-tag">Firebase</span><span class="tl-tag">USA Client</span></div>
+        <div class="tltags"><span class="tltag">OpenAI API</span><span class="tltag">Firebase</span><span class="tltag">USA Client</span></div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- PROJECTS -->
-<section id="projects" style="max-width:1200px;">
-  <div class="sec-label">// work</div>
-  <div class="sec-title">Projects</div>
-  <div class="sec-sub">13 apps — all built solo from architecture to deployment.</div>
-  <div class="proj-filter">
-    <button class="pf-btn on" data-f="all">All</button>
-    <button class="pf-btn" data-f="govt">Government</button>
-    <button class="pf-btn" data-f="iot">IoT & FinTech</button>
-    <button class="pf-btn" data-f="ecom">E-Commerce</button>
-    <button class="pf-btn" data-f="ai">AI</button>
+<section id="projects" style="max-width:1150px;">
+  <div class="sl">// work</div>
+  <div class="st">Projects</div>
+  <div class="ss">13 apps built solo — architecture to deployment.</div>
+  <div class="pf">
+    <button class="pfb on" data-f="all">All</button>
+    <button class="pfb" data-f="govt">Government</button>
+    <button class="pfb" data-f="iot">IoT & FinTech</button>
+    <button class="pfb" data-f="ecom">E-Commerce</button>
+    <button class="pfb" data-f="ai">AI</button>
   </div>
-  <div class="proj-grid">
-    <div class="proj-card" data-c="govt"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(245,158,11,.12);">🏆</div><div class="proj-bdgs"><span class="pbdg pbdg-a">🎖️ Home Minister</span><span class="pbdg pbdg-g">Govt. of Rajasthan</span><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Sweet Exchange — RCDF</div><div class="proj-desc">Govt. inter-dairy sweet exchange app for RCDF launched by Hon. Home Minister Shri Amit Shah. Landmark digital transformation project.</div><div class="proj-chips"><span class="chip">Vehicle Tracking</span><span class="chip">Order Approvals</span><span class="chip">Dairy Logistics</span><span class="chip">RCDF Integration</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">REST API</span><span class="ptag">Firebase</span></div></div>
+  <div class="pgrid">
+    <div class="pcard" data-c="govt"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(245,158,11,.1)">🏆</div><div class="pbdgs"><span class="pb pba">🎖️ Home Minister</span><span class="pb pbg">Govt. Rajasthan</span><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Sweet Exchange — RCDF</div><div class="pd">Govt. inter-dairy app for RCDF launched by Hon. Home Minister Shri Amit Shah. Landmark digital transformation.</div><div class="pchips"><span class="chip">Vehicle Tracking</span><span class="chip">Order Approvals</span><span class="chip">RCDF Integration</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">REST API</span><span class="ptag">Firebase</span></div></div>
 
-    <div class="proj-card" data-c="iot"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(99,102,241,.12);">🤖</div><div class="proj-bdgs"><span class="pbdg pbdg-b">▶ Play Store</span><span class="pbdg pbdg-b">🍎 App Store</span><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">RoboTouch — IoT Massage Chair</div><div class="proj-desc">7-role IoT app with encrypted BLE control, Apple Pay + Stripe + Razorpay, mobile/family/Fastag recharge, Excel reports & role-based dashboards.</div><div class="proj-chips"><span class="chip">7 Roles</span><span class="chip">BLE Encrypted</span><span class="chip">Apple Pay</span><span class="chip">Stripe</span><span class="chip">Razorpay</span><span class="chip">Mobile Recharge</span><span class="chip">Fastag</span><span class="chip">Excel Reports</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">Bluetooth BLE</span><span class="ptag">Razorpay</span><span class="ptag">Stripe</span><span class="ptag">Apple Pay</span><span class="ptag">Firebase</span></div></div>
+    <div class="pcard" data-c="iot"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(99,102,241,.1)">🤖</div><div class="pbdgs"><span class="pb pbb">▶ Play Store</span><span class="pb pbb">🍎 App Store</span><span class="pb pbp">Solo Dev</span></div></div><div class="pn">RoboTouch — IoT Massage Chair</div><div class="pd">7-role IoT app with encrypted BLE, Apple Pay + Stripe + Razorpay, mobile/family/Fastag recharge, Excel reports.</div><div class="pchips"><span class="chip">7 Roles</span><span class="chip">BLE Encrypted</span><span class="chip">Apple Pay</span><span class="chip">Stripe</span><span class="chip">Razorpay</span><span class="chip">Recharge</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">Bluetooth BLE</span><span class="ptag">Stripe</span><span class="ptag">Apple Pay</span><span class="ptag">Razorpay</span></div></div>
 
-    <div class="proj-card" data-c="govt"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(16,185,129,.12);">🏛️</div><div class="proj-bdgs"><span class="pbdg pbdg-g">Govt. Deployment</span><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">DIPR — Govt. Field Reporting</div><div class="proj-desc">Official govt. field reporting app for Dept. of Information & Public Relations with EXIF extraction and auto PDF/Excel reports.</div><div class="proj-chips"><span class="chip">EXIF Extraction</span><span class="chip">Auto PDF</span><span class="chip">Auto Excel</span><span class="chip">Task Tracking</span><span class="chip">GPS</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">PDF Gen</span><span class="ptag">Excel Gen</span></div></div>
+    <div class="pcard" data-c="govt"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(16,185,129,.1)">🏛️</div><div class="pbdgs"><span class="pb pbg">Govt. Deployment</span><span class="pb pbp">Solo Dev</span></div></div><div class="pn">DIPR — Govt. Field Reporting</div><div class="pd">Official govt. app for Dept. of Information & Public Relations with EXIF extraction and auto PDF/Excel reports.</div><div class="pchips"><span class="chip">EXIF</span><span class="chip">Auto PDF</span><span class="chip">Auto Excel</span><span class="chip">GPS</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">PDF Gen</span><span class="ptag">Excel Gen</span></div></div>
 
-    <div class="proj-card" data-c="govt"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(59,130,246,.12);">💧</div><div class="proj-bdgs"><span class="pbdg pbdg-b">▶ Play Store</span><span class="pbdg pbdg-g">Govt. Project</span><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">APDP Water ATM</div><div class="proj-desc">QR payment system for citizens to buy water from automated govt. booths with live operator dashboards.</div><div class="proj-chips"><span class="chip">QR Pay</span><span class="chip">Digital Wallet</span><span class="chip">Live Dashboard</span><span class="chip">Billing</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">QR Scanner</span><span class="ptag">Firebase</span><span class="ptag">REST API</span></div></div>
+    <div class="pcard" data-c="govt"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(59,130,246,.1)">💧</div><div class="pbdgs"><span class="pb pbb">▶ Play Store</span><span class="pb pbg">Govt.</span><span class="pb pbp">Solo Dev</span></div></div><div class="pn">APDP Water ATM</div><div class="pd">QR payment for citizens to buy water from govt. booths with live dashboards.</div><div class="pchips"><span class="chip">QR Pay</span><span class="chip">Wallet</span><span class="chip">Dashboard</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">QR</span><span class="ptag">Firebase</span></div></div>
 
-    <div class="proj-card" data-c="govt"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(16,185,129,.12);">🥛</div><div class="proj-bdgs"><span class="pbdg pbdg-b">▶ Play Store</span><span class="pbdg pbdg-g">Saras Initiative</span><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Saras Marketing — Dairy Mgmt</div><div class="proj-desc">Field attendance and GPS route monitoring for Ajmera Dairy under Saras govt. initiative with automated daily reports.</div><div class="proj-chips"><span class="chip">GPS Tracking</span><span class="chip">Attendance</span><span class="chip">Order Mgmt</span><span class="chip">Auto Reports</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">Firebase</span><span class="ptag">REST API</span></div></div>
+    <div class="pcard" data-c="govt"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(16,185,129,.1)">🥛</div><div class="pbdgs"><span class="pb pbb">▶ Play Store</span><span class="pb pbg">Saras Initiative</span><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Saras Marketing — Dairy Mgmt</div><div class="pd">GPS attendance & route monitoring for Ajmera Dairy under Saras govt. initiative.</div><div class="pchips"><span class="chip">GPS</span><span class="chip">Attendance</span><span class="chip">Auto Reports</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">Firebase</span></div></div>
 
-    <div class="proj-card" data-c="govt"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(14,165,233,.12);">🚛</div><div class="proj-bdgs"><span class="pbdg pbdg-g">Govt. Project</span><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Water Tanker Management</div><div class="proj-desc">Live GPS dispatch platform for citizen water tanker booking with automated invoicing and dispatch coordination.</div><div class="proj-chips"><span class="chip">Live GPS</span><span class="chip">Citizen Booking</span><span class="chip">Auto Invoice</span><span class="chip">Dispatch</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">Firebase</span><span class="ptag">REST API</span></div></div>
+    <div class="pcard" data-c="govt"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(14,165,233,.1)">🚛</div><div class="pbdgs"><span class="pb pbg">Govt.</span><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Water Tanker Management</div><div class="pd">Live GPS dispatch platform for citizen water booking with automated invoicing.</div><div class="pchips"><span class="chip">Live GPS</span><span class="chip">Booking</span><span class="chip">Invoice</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">GPS</span><span class="ptag">Firebase</span></div></div>
 
-    <div class="proj-card" data-c="ecom"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(244,63,94,.12);">🛒</div><div class="proj-bdgs"><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Sofo — E-Commerce Marketplace</div><div class="proj-desc">Complete shopping platform with smart search, geo-delivery, real-time order tracking, COD and online payments.</div><div class="proj-chips"><span class="chip">Smart Search</span><span class="chip">Geo Delivery</span><span class="chip">Order Tracking</span><span class="chip">COD + Online</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">Razorpay</span><span class="ptag">REST API</span><span class="ptag">Firebase</span></div></div>
+    <div class="pcard" data-c="ecom"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(244,63,94,.1)">🛒</div><div class="pbdgs"><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Sofo — E-Commerce Marketplace</div><div class="pd">Complete shopping platform with smart search, geo-delivery, order tracking, COD and online payments.</div><div class="pchips"><span class="chip">Smart Search</span><span class="chip">Geo Delivery</span><span class="chip">Order Tracking</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">Razorpay</span><span class="ptag">REST API</span></div></div>
 
-    <div class="proj-card" data-c="ecom"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(99,102,241,.12);">🌍</div><div class="proj-bdgs"><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">International E-Commerce + Stripe</div><div class="proj-desc">Full international e-commerce with Stripe gateway for secure cross-border payments, order lifecycle management.</div><div class="proj-chips"><span class="chip">Stripe</span><span class="chip">Cross-border</span><span class="chip">Order Lifecycle</span><span class="chip">Wishlist</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">Stripe</span><span class="ptag">REST API</span></div></div>
+    <div class="pcard" data-c="ecom"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(99,102,241,.1)">🌍</div><div class="pbdgs"><span class="pb pbp">Solo Dev</span></div></div><div class="pn">International E-Commerce + Stripe</div><div class="pd">Full international platform with Stripe for cross-border payments and order lifecycle.</div><div class="pchips"><span class="chip">Stripe</span><span class="chip">Cross-border</span><span class="chip">Wishlist</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">Stripe</span><span class="ptag">REST API</span></div></div>
 
-    <div class="proj-card" data-c="ecom"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(14,165,233,.12);">🚗</div><div class="proj-bdgs"><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Magic Wash — Vehicle Services</div><div class="proj-desc">Car & bike washing service booking with live appointment tracking, payment gateway, service history and user feedback.</div><div class="proj-chips"><span class="chip">Service Booking</span><span class="chip">Live Tracking</span><span class="chip">Payment</span><span class="chip">Feedback</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">REST API</span><span class="ptag">Firebase</span></div></div>
+    <div class="pcard" data-c="ecom"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(14,165,233,.1)">🚗</div><div class="pbdgs"><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Magic Wash — Vehicle Services</div><div class="pd">Car & bike service booking with live tracking, payment gateway and user feedback.</div><div class="pchips"><span class="chip">Booking</span><span class="chip">Live Tracking</span><span class="chip">Feedback</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">REST API</span><span class="ptag">Firebase</span></div></div>
 
-    <div class="proj-card" data-c="ecom"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(245,158,11,.12);">🧞</div><div class="proj-bdgs"><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Magic Genie — Workforce Mgmt</div><div class="proj-desc">Field workforce tool — attendance, shift booking, post-work image uploads, real-time task tracking and supervisor dashboards.</div><div class="proj-chips"><span class="chip">Attendance</span><span class="chip">Shift Booking</span><span class="chip">Image Upload</span><span class="chip">Supervisor Report</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">Firebase</span><span class="ptag">REST API</span></div></div>
+    <div class="pcard" data-c="ecom"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(245,158,11,.1)">🧞</div><div class="pbdgs"><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Magic Genie — Workforce Mgmt</div><div class="pd">Field workforce tool — attendance, shift booking, image uploads, supervisor dashboards.</div><div class="pchips"><span class="chip">Attendance</span><span class="chip">Shift</span><span class="chip">Reports</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">Firebase</span><span class="ptag">REST API</span></div></div>
 
-    <div class="proj-card" data-c="ai"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(139,92,246,.12);">🧠</div><div class="proj-bdgs"><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">AI Chatbot — OpenAI</div><div class="proj-desc">Production app with OpenAI ChatGPT API integration — AI-powered conversational customer support automation.</div><div class="proj-chips"><span class="chip">ChatGPT API</span><span class="chip">AI Responses</span><span class="chip">Auto Support</span><span class="chip">Real-time</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">OpenAI API</span><span class="ptag">Firebase</span></div></div>
+    <div class="pcard" data-c="ai"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(139,92,246,.1)">🧠</div><div class="pbdgs"><span class="pb pbp">Solo Dev</span></div></div><div class="pn">AI Chatbot — OpenAI</div><div class="pd">Production app with OpenAI ChatGPT API — AI-powered conversational customer support.</div><div class="pchips"><span class="chip">ChatGPT API</span><span class="chip">AI Responses</span><span class="chip">Real-time</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">OpenAI API</span><span class="ptag">Firebase</span></div></div>
 
-    <div class="proj-card" data-c="ai"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(59,130,246,.12);">🌦️</div><div class="proj-bdgs"><span class="pbdg pbdg-p">Solo Dev</span></div></div><div class="proj-name">Weather App — 3D Animated</div><div class="proj-desc">Immersive weather app with stunning 3D animations and live weather API integration built at WebrockMedia.</div><div class="proj-chips"><span class="chip">3D Animations</span><span class="chip">Live Weather</span><span class="chip">Immersive UI</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">Weather API</span><span class="ptag">3D Animations</span></div></div>
+    <div class="pcard" data-c="ai"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(59,130,246,.1)">🌦️</div><div class="pbdgs"><span class="pb pbp">Solo Dev</span></div></div><div class="pn">Weather App — 3D Animated</div><div class="pd">Immersive weather app with 3D animations and live weather API integration.</div><div class="pchips"><span class="chip">3D Animations</span><span class="chip">Live Weather</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">Weather API</span><span class="ptag">3D</span></div></div>
 
-    <div class="proj-card" data-c="ecom"><div class="proj-glow"></div><div class="proj-top"><div class="proj-emoji" style="background:rgba(244,63,94,.12);">🇺🇸</div><div class="proj-bdgs"><span class="pbdg pbdg-b">USA Client</span><span class="pbdg pbdg-p">Contributor</span></div></div><div class="proj-name">YellWish — USA Based App</div><div class="proj-desc">USA-based Flutter client project — designed and implemented Flutter UI significantly boosting user engagement.</div><div class="proj-chips"><span class="chip">USA Client</span><span class="chip">Flutter UI</span><span class="chip">Firebase Auth</span><span class="chip">FCM</span></div><div class="proj-tech"><span class="ptag">Flutter</span><span class="ptag">Firebase</span><span class="ptag">FCM</span></div></div>
+    <div class="pcard" data-c="ecom"><div class="pglow"></div><div class="ptop"><div class="pico" style="background:rgba(244,63,94,.1)">🇺🇸</div><div class="pbdgs"><span class="pb pbb">USA Client</span></div></div><div class="pn">YellWish — USA Based App</div><div class="pd">USA-based Flutter client project at WebrockMedia — Flutter UI boosting engagement.</div><div class="pchips"><span class="chip">USA Client</span><span class="chip">Flutter UI</span><span class="chip">FCM</span></div><div class="ptechs"><span class="ptag">Flutter</span><span class="ptag">Firebase</span><span class="ptag">FCM</span></div></div>
+  </div>
+</section>
+
+<!-- TARGET COMPANIES -->
+<section id="targets">
+  <div class="sl">// dream companies</div>
+  <div class="st">Where I'm Headed</div>
+  <div class="ss">Clear roadmap — step by step to the best product companies in the world.</div>
+  <div class="companies-grid">
+    <div class="co-card"><div class="co-emoji">💳</div><div class="co-name">Razorpay</div><div class="co-when">Nov 2026</div><div class="co-sal">₹1L–1.5L/mo · Hybrid</div></div>
+    <div class="co-card"><div class="co-emoji">⚡</div><div class="co-name">Juspay</div><div class="co-when">Nov 2026</div><div class="co-sal">₹90k–1.2L/mo · Hybrid</div></div>
+    <div class="co-card"><div class="co-emoji">📦</div><div class="co-name">Postman</div><div class="co-when">2027</div><div class="co-sal">₹1L–1.4L/mo · Remote</div></div>
+    <div class="co-card"><div class="co-emoji">🦊</div><div class="co-name">GitLab</div><div class="co-when">2027</div><div class="co-sal">₹1.5L+/mo · Full Remote</div></div>
+    <div class="co-card"><div class="co-emoji">🎯</div><div class="co-name">Atlassian</div><div class="co-when">2027–28</div><div class="co-sal">₹1.5L–2L/mo · Hybrid</div></div>
+    <div class="co-card"><div class="co-emoji">🎨</div><div class="co-name">Adobe India</div><div class="co-when">2028–29</div><div class="co-sal">₹1.5L–2L/mo · Hybrid</div></div>
+    <div class="co-card"><div class="co-emoji">🚗</div><div class="co-name">BMW IT Germany</div><div class="co-when">2029–31</div><div class="co-sal">€5–8k/mo · Germany</div></div>
+    <div class="co-card"><div class="co-emoji">🔷</div><div class="co-name">SAP Germany</div><div class="co-when">2029–31</div><div class="co-sal">€5–7k/mo · Germany</div></div>
   </div>
 </section>
 
 <!-- SKILLS -->
 <section id="skills">
-  <div class="sec-label">// expertise</div>
-  <div class="sec-title">Technical Skills</div>
-  <div class="skills-wrap">
-    <div class="sk-card"><div class="sk-cat">Mobile Development</div><div class="sk-items"><span class="sk-item hi">Flutter</span><span class="sk-item hi">Dart</span><span class="sk-item">Android</span><span class="sk-item">iOS</span><span class="sk-item">Cross-Platform</span></div></div>
-    <div class="sk-card"><div class="sk-cat">AI Integration</div><div class="sk-items"><span class="sk-item ai">OpenAI API</span><span class="sk-item ai">ChatGPT</span><span class="sk-item">REST APIs</span><span class="sk-item">.NET API</span></div></div>
-    <div class="sk-card"><div class="sk-cat">Payments & FinTech</div><div class="sk-items"><span class="sk-item hi">Stripe (Intl.)</span><span class="sk-item hi">Razorpay</span><span class="sk-item hi">Apple Pay</span><span class="sk-item">Digital Wallet</span><span class="sk-item">QR Pay</span><span class="sk-item">Mobile Recharge</span><span class="sk-item">Fastag</span></div></div>
-    <div class="sk-card"><div class="sk-cat">Backend & Database</div><div class="sk-items"><span class="sk-item">Firebase Auth</span><span class="sk-item">Firestore</span><span class="sk-item">Realtime DB</span><span class="sk-item">FCM</span><span class="sk-item">SQL</span></div></div>
-    <div class="sk-card"><div class="sk-cat">IoT & Hardware</div><div class="sk-items"><span class="sk-item hi">Bluetooth BLE</span><span class="sk-item">Encrypted Cmds</span><span class="sk-item">IoT Devices</span><span class="sk-item">GPS Tracking</span></div></div>
-    <div class="sk-card"><div class="sk-cat">Govt. & Reporting</div><div class="sk-items"><span class="sk-item">EXIF Extraction</span><span class="sk-item">PDF Reports</span><span class="sk-item">Excel Sheets</span><span class="sk-item">Live Dashboards</span></div></div>
-    <div class="sk-card"><div class="sk-cat">Currently Learning</div><div class="sk-items"><span class="sk-item ai">Java DSA</span><span class="sk-item ai">Spring Boot</span><span class="sk-item">System Design</span><span class="sk-item">LeetCode</span></div></div>
-    <div class="sk-card"><div class="sk-cat">Tools & Design</div><div class="sk-items"><span class="sk-item">Git</span><span class="sk-item">GitHub</span><span class="sk-item">UI/UX Design</span><span class="sk-item">Play Store</span><span class="sk-item">App Store</span></div></div>
+  <div class="sl">// expertise</div>
+  <div class="st">Technical Skills</div>
+  <div class="skgrid">
+    <div class="scard"><div class="scat">Mobile Development</div><div class="sitems"><span class="si hi">Flutter</span><span class="si hi">Dart</span><span class="si">Android</span><span class="si">iOS</span><span class="si">Cross-Platform</span></div></div>
+    <div class="scard"><div class="scat">AI Integration</div><div class="sitems"><span class="si ai">OpenAI API</span><span class="si ai">ChatGPT</span><span class="si">REST APIs</span><span class="si">.NET API</span></div></div>
+    <div class="scard"><div class="scat">Payments & FinTech</div><div class="sitems"><span class="si hi">Stripe (Intl.)</span><span class="si hi">Razorpay</span><span class="si hi">Apple Pay</span><span class="si">Digital Wallet</span><span class="si">QR Pay</span><span class="si">Mobile Recharge</span><span class="si">Fastag</span></div></div>
+    <div class="scard"><div class="scat">Backend & Database</div><div class="sitems"><span class="si">Firebase Auth</span><span class="si">Firestore</span><span class="si">Realtime DB</span><span class="si">FCM</span><span class="si">SQL</span></div></div>
+    <div class="scard"><div class="scat">IoT & Hardware</div><div class="sitems"><span class="si hi">Bluetooth BLE</span><span class="si">Encrypted Cmds</span><span class="si">IoT Devices</span><span class="si">GPS</span></div></div>
+    <div class="scard"><div class="scat">Govt. & Reporting</div><div class="sitems"><span class="si">EXIF Extraction</span><span class="si">PDF Reports</span><span class="si">Excel Sheets</span><span class="si">Dashboards</span></div></div>
+    <div class="scard"><div class="scat">Currently Learning</div><div class="sitems"><span class="si ai">Java DSA</span><span class="si ai">Spring Boot</span><span class="si">System Design</span><span class="si">LeetCode</span></div></div>
+    <div class="scard"><div class="scat">Tools</div><div class="sitems"><span class="si">Git</span><span class="si">GitHub</span><span class="si">UI/UX Design</span><span class="si">Play Store</span><span class="si">App Store</span></div></div>
   </div>
 </section>
 
 <!-- ACHIEVEMENTS -->
 <section>
-  <div class="sec-label">// highlights</div>
-  <div class="sec-title">Achievements</div>
-  <div class="ach-grid">
-    <div class="ach-card"><div class="ach-ico">🎖️</div><div><div class="ach-t">Home Minister Launch</div><div class="ach-d">Sweet Exchange app officially launched by Hon. Home Minister Shri Amit Shah — landmark govt. digital project.</div></div></div>
-    <div class="ach-card"><div class="ach-ico">🏛️</div><div><div class="ach-t">Govt. of India — DOT</div><div class="ach-d">Currently Software Developer at Dept. of Telecommunication, Ministry of Communications.</div></div></div>
-    <div class="ach-card"><div class="ach-ico">📱</div><div><div class="ach-t">10+ Solo Production Apps</div><div class="ach-d">Every app built end-to-end solo — architecture to Play Store & App Store deployment.</div></div></div>
-    <div class="ach-card"><div class="ach-ico">💳</div><div><div class="ach-t">Multi-Gateway Payments</div><div class="ach-d">Stripe (international), Razorpay (national), Apple Pay — all integrated in live production apps.</div></div></div>
-    <div class="ach-card"><div class="ach-ico">🤖</div><div><div class="ach-t">AI in Production</div><div class="ach-d">OpenAI ChatGPT API integrated in live app — real users, real conversations.</div></div></div>
-    <div class="ach-card"><div class="ach-ico">🎓</div><div><div class="ach-t">B.Tech Distinction — RTU Kota</div><div class="ach-d">CSE with Distinction, Zero Backlogs — Shankara Institute of Technology, 2025.</div></div></div>
+  <div class="sl">// highlights</div>
+  <div class="st">Achievements</div>
+  <div class="agrid">
+    <div class="acard"><div class="aico">🎖️</div><div><div class="at">Home Minister Launch</div><div class="ad">Sweet Exchange launched by Hon. Home Minister Shri Amit Shah — landmark govt. digital project.</div></div></div>
+    <div class="acard"><div class="aico">🏛️</div><div><div class="at">Govt. of India — DOT</div><div class="ad">Software Developer at Dept. of Telecommunication, Ministry of Communications.</div></div></div>
+    <div class="acard"><div class="aico">📱</div><div><div class="at">10+ Solo Apps</div><div class="ad">Every app built end-to-end solo — architecture to Play Store deployment.</div></div></div>
+    <div class="acard"><div class="aico">💳</div><div><div class="at">Multi-Gateway Expert</div><div class="ad">Stripe (intl.), Razorpay (national), Apple Pay — all in live production apps.</div></div></div>
+    <div class="acard"><div class="aico">🤖</div><div><div class="at">AI in Production</div><div class="ad">OpenAI ChatGPT API in live production — real users, real conversations.</div></div></div>
+    <div class="acard"><div class="aico">🎓</div><div><div class="at">B.Tech Distinction</div><div class="ad">CSE with Distinction, Zero Backlogs — Shankara Institute (RTU Kota), 2025.</div></div></div>
   </div>
 </section>
 
 <!-- CONTACT -->
 <section id="contact">
-  <div class="contact-box">
-    <div class="contact-orb"></div>
-    <div class="sec-label" style="justify-content:center;">// let's connect</div>
-    <div class="contact-title">Open to <span style="background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Product Companies</span></div>
-    <div class="contact-sub">Targeting WFH/Hybrid roles in Gurugram & Remote<br>Flutter + Java Backend · ₹1L+/month</div>
-    <div class="contact-links">
-      <a href="mailto:csvishal6724@gmail.com" class="clink"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>csvishal6724@gmail.com</a>
-      <a href="tel:+919782691587" class="clink"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 1.18 2 2 0 012.03 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>+91 9782691587</a>
-      <a href="https://www.linkedin.com/in/vishal-singh-a0021726b" target="_blank" class="clink"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>
-      <a href="https://github.com/vishalsinghengineer01" target="_blank" class="clink"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>GitHub</a>
+  <div class="cbox">
+    <div class="corb"></div>
+    <div class="sl" style="justify-content:center;">// let's connect</div>
+    <div class="ct">Open to <span style="background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Product Companies</span></div>
+    <div class="cs2">WFH/Hybrid · Gurugram & Remote · Flutter + Java Backend · ₹1L+/month</div>
+    <div class="clinks">
+      <a href="mailto:csvishal6724@gmail.com" class="cl"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>csvishal6724@gmail.com</a>
+      <a href="tel:+919782691587" class="cl"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 1.18 2 2 0 012.03 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>+91 9782691587</a>
+      <a href="https://www.linkedin.com/in/vishal-singh-a0021726b" target="_blank" class="cl"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>
+      <a href="https://github.com/vishalsinghengineer01" target="_blank" class="cl"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>GitHub</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <div>Built with ❤️ by <strong style="color:var(--text2);">Vishal Singh</strong> · Flutter Developer · Jaipur / Delhi</div>
-  <div style="margin-top:0.4rem;">© 2026 · Open to WFH/Hybrid Product Company Roles · <span style="color:var(--indigo);">vishalsinghengineer01.github.io</span></div>
+  <div>Built with ❤️ by <strong style="color:var(--text2)">Vishal Singh</strong> · Flutter Developer · Jaipur / Delhi</div>
+  <div style="margin-top:.4rem">© 2026 · Open to WFH/Hybrid · <span style="color:var(--indigo)">vishalsinghengineer01.github.io</span></div>
 </footer>
-
+</div>
 </div>
 
 <button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
-// ── LOADER ──────────────────────────────────────────────────────────────────
-const loaderTexts = ['INITIALIZING','LOADING ASSETS','BUILDING UI','ALMOST READY','LAUNCHING'];
-let pct = 0;
-const lbar = document.getElementById('loader-bar');
-const lpct = document.getElementById('loader-pct');
-const ltxt = document.getElementById('loader-text');
-const lInterval = setInterval(() => {
-  pct += Math.random() * 15 + 5;
-  if(pct > 100) pct = 100;
-  lbar.style.width = pct + '%';
-  lpct.textContent = Math.floor(pct) + '%';
-  ltxt.textContent = loaderTexts[Math.floor(pct/25)] || 'LAUNCHING';
-  if(pct >= 100) {
-    clearInterval(lInterval);
-    setTimeout(() => {
-      const loader = document.getElementById('loader');
-      loader.style.transition = 'opacity 0.8s, transform 0.8s';
-      loader.style.opacity = '0';
-      loader.style.transform = 'scale(1.05)';
-      setTimeout(() => { loader.style.display = 'none'; initAnimations(); }, 800);
-    }, 300);
-  }
-}, 120);
+// ═══════════════════════════════════════════════
+// THREE.JS — 3D DEVELOPER SCENE
+// ═══════════════════════════════════════════════
+const canvas = document.getElementById('hero-canvas');
+const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
 
-// ── THREE.JS BACKGROUND ─────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('three-canvas'), alpha: true, antialias: true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-camera.position.z = 30;
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+camera.position.set(0, 1.5, 6);
+camera.lookAt(0, 0.5, 0);
 
-// Particles
-const geo = new THREE.BufferGeometry();
-const count = 2000;
-const pos = new Float32Array(count * 3);
-const col = new Float32Array(count * 3);
-const colors = [[0.23,0.51,0.96],[0.39,0.40,0.95],[0.55,0.36,0.96],[0.08,0.71,0.82]];
-for(let i=0;i<count;i++){
-  pos[i*3]=(Math.random()-0.5)*120;
-  pos[i*3+1]=(Math.random()-0.5)*120;
-  pos[i*3+2]=(Math.random()-0.5)*120;
-  const c=colors[Math.floor(Math.random()*colors.length)];
-  col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
+// LIGHTING
+const ambient = new THREE.AmbientLight(0x111133, 1.5);
+scene.add(ambient);
+const blueLight = new THREE.PointLight(0x6366f1, 8, 25);
+blueLight.position.set(-4, 5, 3);
+scene.add(blueLight);
+const purpleLight = new THREE.PointLight(0x8b5cf6, 6, 25);
+purpleLight.position.set(5, 3, 2);
+scene.add(purpleLight);
+const cyanLight = new THREE.PointLight(0x06b6d4, 4, 20);
+cyanLight.position.set(0, -1, 5);
+scene.add(cyanLight);
+const rimLight = new THREE.PointLight(0xec4899, 3, 15);
+rimLight.position.set(0, 8, -5);
+scene.add(rimLight);
+
+// ── DESK / SURFACE ──────────────────────────────
+const deskGeo = new THREE.BoxGeometry(6, 0.12, 2.8);
+const deskMat = new THREE.MeshStandardMaterial({color:0x0d1117, roughness:0.3, metalness:0.6});
+const desk = new THREE.Mesh(deskGeo, deskMat);
+desk.position.set(0, -0.8, 0);
+desk.receiveShadow = true;
+scene.add(desk);
+
+// Desk glow strip
+const stripGeo = new THREE.BoxGeometry(5.8, 0.04, 0.08);
+const stripMat = new THREE.MeshBasicMaterial({color:0x6366f1});
+const strip = new THREE.Mesh(stripGeo, stripMat);
+strip.position.set(0, -0.73, -1.36);
+scene.add(strip);
+
+// ── LAPTOP ──────────────────────────────────────
+const laptopGroup = new THREE.Group();
+
+// Base
+const baseGeo = new THREE.BoxGeometry(2.2, 0.08, 1.5);
+const metalMat = new THREE.MeshStandardMaterial({color:0x1c1c2e, roughness:0.15, metalness:0.9});
+const base = new THREE.Mesh(baseGeo, metalMat);
+base.position.set(0, 0, 0);
+laptopGroup.add(base);
+
+// Keyboard surface
+const kbGeo = new THREE.BoxGeometry(2.0, 0.01, 1.3);
+const kbMat = new THREE.MeshStandardMaterial({color:0x0d0d1a, roughness:0.8});
+const kb = new THREE.Mesh(kbGeo, kbMat);
+kb.position.set(0, 0.045, 0);
+laptopGroup.add(kb);
+
+// Screen hinge
+const screenGroup = new THREE.Group();
+screenGroup.position.set(0, 0.04, -0.75);
+
+// Screen frame
+const sfGeo = new THREE.BoxGeometry(2.2, 1.5, 0.07);
+const sf = new THREE.Mesh(sfGeo, metalMat);
+sf.position.set(0, 0.75, 0);
+screenGroup.add(sf);
+
+// Screen display
+const sdGeo = new THREE.BoxGeometry(2.0, 1.32, 0.02);
+const sdMat = new THREE.MeshBasicMaterial({color:0x0a0e1a});
+const sd = new THREE.Mesh(sdGeo, sdMat);
+sd.position.set(0, 0.77, 0.045);
+screenGroup.add(sd);
+
+// Screen glow (code on screen)
+const sgGeo = new THREE.BoxGeometry(1.85, 1.18, 0.01);
+const sgMat = new THREE.MeshBasicMaterial({color:0x1a0a2e});
+const sg = new THREE.Mesh(sgGeo, sgMat);
+sg.position.set(0, 0.77, 0.056);
+screenGroup.add(sg);
+
+// Code lines on screen
+const lineColors = [0x6366f1, 0x8b5cf6, 0x06b6d4, 0x10b981, 0xf59e0b, 0x6366f1];
+for(let i=0; i<8; i++){
+  const w = 0.3 + Math.random()*1.2;
+  const x = -0.7 + Math.random()*0.3;
+  const lg = new THREE.BoxGeometry(w, 0.045, 0.005);
+  const lm = new THREE.MeshBasicMaterial({color: lineColors[i % lineColors.length]});
+  const l = new THREE.Mesh(lg, lm);
+  l.position.set(x + w/2 - 0.9, 1.12 - i*0.14, 0.062);
+  screenGroup.add(l);
 }
-geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-geo.setAttribute('color',new THREE.BufferAttribute(col,3));
-const mat = new THREE.PointsMaterial({size:0.3,vertexColors:true,transparent:true,opacity:0.7});
-const points = new THREE.Points(geo,mat);
-scene.add(points);
 
-// Floating geometric shapes
-function makeShape(type, color, x, y, z, size) {
-  let g;
-  if(type==='box') g=new THREE.BoxGeometry(size,size,size);
-  else if(type==='oct') g=new THREE.OctahedronGeometry(size);
-  else g=new THREE.IcosahedronGeometry(size);
-  const m=new THREE.MeshBasicMaterial({color,wireframe:true,transparent:true,opacity:0.15});
-  const mesh=new THREE.Mesh(g,m);
-  mesh.position.set(x,y,z);
+screenGroup.rotation.x = -Math.PI * 0.08;
+laptopGroup.add(screenGroup);
+laptopGroup.position.set(-0.3, -0.74, 0.2);
+scene.add(laptopGroup);
+
+// Screen glow light
+const screenLight = new THREE.PointLight(0x6366f1, 3, 5);
+screenLight.position.set(-0.3, 0.5, 1.2);
+scene.add(screenLight);
+
+// ── MONITOR ─────────────────────────────────────
+const monitorGroup = new THREE.Group();
+
+// Stand
+const stGeo = new THREE.BoxGeometry(0.08, 0.6, 0.08);
+const stMesh = new THREE.Mesh(stGeo, metalMat);
+stMesh.position.set(0, 0.3, 0);
+monitorGroup.add(stMesh);
+
+const baseM = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.06,0.3), metalMat);
+baseM.position.set(0, 0, 0);
+monitorGroup.add(baseM);
+
+// Monitor frame
+const mfGeo = new THREE.BoxGeometry(2.8, 1.8, 0.1);
+const mfMesh = new THREE.Mesh(mfGeo, metalMat);
+mfMesh.position.set(0, 1.5, 0);
+monitorGroup.add(mfMesh);
+
+// Monitor screen
+const msGeo = new THREE.BoxGeometry(2.6, 1.62, 0.05);
+const msMat = new THREE.MeshBasicMaterial({color:0x060a18});
+const ms = new THREE.Mesh(msGeo, msMat);
+ms.position.set(0, 1.5, 0.08);
+monitorGroup.add(ms);
+
+// Monitor code content
+const mLineColors = [0x6366f1, 0xc792ea, 0x82aaff, 0xc3e88d, 0x06b6d4, 0xf59e0b];
+for(let i=0; i<12; i++){
+  const indent = i % 3 === 0 ? 0 : (i % 3 === 1 ? 0.12 : 0.24);
+  const w = 0.5 + Math.random()*1.5;
+  const mg = new THREE.BoxGeometry(w, 0.05, 0.02);
+  const mm2 = new THREE.MeshBasicMaterial({color: mLineColors[i % mLineColors.length], transparent:true, opacity:0.85});
+  const ml = new THREE.Mesh(mg, mm2);
+  ml.position.set(-1.1 + indent + w/2, 2.1 - i*0.12, 0.115);
+  monitorGroup.add(ml);
+}
+
+monitorGroup.position.set(1.8, -0.8, -1.0);
+monitorGroup.rotation.y = -0.3;
+scene.add(monitorGroup);
+
+// Monitor light
+const monLight = new THREE.PointLight(0x8b5cf6, 2, 6);
+monLight.position.set(1.8, 1.2, 0);
+scene.add(monLight);
+
+// ── KEYBOARD ────────────────────────────────────
+const kbMainGeo = new THREE.BoxGeometry(1.8, 0.07, 0.6);
+const kbMainMat = new THREE.MeshStandardMaterial({color:0x111126, roughness:0.4, metalness:0.6});
+const kbMain = new THREE.Mesh(kbMainGeo, kbMainMat);
+kbMain.position.set(1.6, -0.73, 0.5);
+scene.add(kbMain);
+
+// Key lights (RGB keyboard glow)
+for(let i=0; i<8; i++){
+  const kl = new THREE.BoxGeometry(0.18,0.01,0.14);
+  const klm = new THREE.MeshBasicMaterial({color: [0x6366f1,0x8b5cf6,0x06b6d4,0xec4899][i%4]});
+  const km = new THREE.Mesh(kl, klm);
+  km.position.set(1.0 + i*0.22, -0.66, 0.48);
+  scene.add(km);
+}
+
+// ── MOUSE ────────────────────────────────────────
+const mouseGeo = new THREE.BoxGeometry(0.18, 0.05, 0.28);
+mouseGeo.translate(0, 0, 0);
+const mouseMesh = new THREE.Mesh(mouseGeo, new THREE.MeshStandardMaterial({color:0x1a1a2e, roughness:0.3, metalness:0.7}));
+mouseMesh.position.set(2.7, -0.73, 0.5);
+scene.add(mouseMesh);
+
+// ── MUG ──────────────────────────────────────────
+const mugGroup = new THREE.Group();
+const mugGeo = new THREE.CylinderGeometry(0.15, 0.12, 0.35, 12);
+const mugMat = new THREE.MeshStandardMaterial({color:0x1e1e3a, roughness:0.5, metalness:0.2});
+const mug = new THREE.Mesh(mugGeo, mugMat);
+mugGroup.add(mug);
+const steamGeo = new THREE.CylinderGeometry(0.01,0.04,0.2,6);
+const steamMat = new THREE.MeshBasicMaterial({color:0x6366f1, transparent:true, opacity:0.3});
+const steam = new THREE.Mesh(steamGeo, steamMat);
+steam.position.set(0, 0.3, 0);
+mugGroup.add(steam);
+mugGroup.position.set(-2.0, -0.6, 0.3);
+scene.add(mugGroup);
+
+// ── FLOATING TECH ICONS (3D text-like cubes) ─────
+const techIcons = [
+  {label:'Flutter', color:0x54c5f8, pos:[-3,1.5,-1]},
+  {label:'Dart',    color:0x0175c2, pos:[3.5,2,-0.5]},
+  {label:'Firebase',color:0xffa000, pos:[-3.5,0.5,-2]},
+  {label:'OpenAI', color:0x10b981, pos:[3,0.8,-2]},
+  {label:'Stripe',  color:0x6366f1, pos:[-2.5,3,-1.5]},
+  {label:'Apple',   color:0xaaaaaa, pos:[2.5,3,-1]},
+];
+const floaters = techIcons.map(({color,pos})=>{
+  const g = new THREE.OctahedronGeometry(0.18,0);
+  const m = new THREE.MeshStandardMaterial({color, roughness:0.2, metalness:0.8, transparent:true, opacity:0.8});
+  const mesh = new THREE.Mesh(g,m);
+  mesh.position.set(...pos);
   scene.add(mesh);
   return mesh;
-}
-const shapes=[
-  makeShape('oct',0x6366f1,15,8,-10,3),
-  makeShape('ico',0x8b5cf6,-12,5,-8,2),
-  makeShape('box',0x06b6d4,8,-10,-15,2.5),
-  makeShape('oct',0x3b82f6,-8,12,-12,1.5),
-  makeShape('ico',0xec4899,18,-5,-10,2),
-];
-let mouseX=0,mouseY=0;
-document.addEventListener('mousemove',e=>{mouseX=(e.clientX/window.innerWidth-0.5)*2;mouseY=(e.clientY/window.innerHeight-0.5)*2;});
-window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-let t=0;
-function animateThree(){
-  requestAnimationFrame(animateThree);
-  t+=0.003;
-  points.rotation.x+=0.0003;
-  points.rotation.y+=0.0005;
-  camera.position.x+=(mouseX*3-camera.position.x)*0.02;
-  camera.position.y+=(-mouseY*3-camera.position.y)*0.02;
-  shapes.forEach((s,i)=>{s.rotation.x+=0.003+i*0.001;s.rotation.y+=0.004+i*0.001;s.position.y=s.position.y+Math.sin(t+i)*0.008;});
-  renderer.render(scene,camera);
-}
-animateThree();
-
-// ── CURSOR ──────────────────────────────────────────────────────────────────
-const cdot=document.getElementById('cdot');
-const cring=document.getElementById('cring');
-let cx=0,cy=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;});
-function animateCursor(){
-  rx+=(cx-rx)*0.12;ry+=(cy-ry)*0.12;
-  cdot.style.left=cx+'px';cdot.style.top=cy+'px';
-  cring.style.left=rx+'px';cring.style.top=ry+'px';
-  requestAnimationFrame(animateCursor);
-}
-animateCursor();
-document.querySelectorAll('a,button,.proj-card,.bento-card,.sk-card,.ach-card,.pf-btn').forEach(el=>{
-  el.addEventListener('mouseenter',()=>cring.classList.add('hovering'));
-  el.addEventListener('mouseleave',()=>cring.classList.remove('hovering'));
 });
 
-// ── GSAP ANIMATIONS ─────────────────────────────────────────────────────────
-function initAnimations(){
-  gsap.registerPlugin(ScrollTrigger);
+// ── FLOATING PARTICLES ───────────────────────────
+const pGeo = new THREE.BufferGeometry();
+const pCount = 1800;
+const pPos = new Float32Array(pCount*3);
+const pCol = new Float32Array(pCount*3);
+const pColors = [[0.39,0.40,0.95],[0.55,0.36,0.96],[0.04,0.71,0.83],[0.93,0.62,0.04]];
+for(let i=0;i<pCount;i++){
+  pPos[i*3]=(Math.random()-0.5)*30;
+  pPos[i*3+1]=(Math.random()-0.5)*20;
+  pPos[i*3+2]=(Math.random()-0.5)*20-5;
+  const c=pColors[Math.floor(Math.random()*pColors.length)];
+  pCol[i*3]=c[0];pCol[i*3+1]=c[1];pCol[i*3+2]=c[2];
+}
+pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
+const pMat = new THREE.PointsMaterial({size:0.04, vertexColors:true, transparent:true, opacity:0.6});
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
 
-  // NAV
-  gsap.to('#mainnav',{opacity:1,duration:0.8,delay:0.3,ease:'power2.out'});
+// ── BOY / DEVELOPER FIGURE ───────────────────────
+const devGroup = new THREE.Group();
 
-  // HERO
-  gsap.to('#hero-pre',{opacity:1,y:0,duration:0.8,delay:0.2,ease:'power3.out'});
-  gsap.fromTo('#hero-name',{opacity:0,y:60},{opacity:1,y:0,duration:1,delay:0.4,ease:'power3.out'});
-  gsap.to('#hero-desc',{opacity:1,y:0,duration:0.8,delay:0.7,ease:'power3.out'});
-  gsap.to('#hero-tags',{opacity:1,y:0,duration:0.8,delay:0.9,ease:'power3.out'});
-  gsap.to('#hero-ctas',{opacity:1,y:0,duration:0.8,delay:1.1,ease:'power3.out'});
+// Body
+const bodyGeo = new THREE.CylinderGeometry(0.22,0.18,0.7,10);
+const bodyMat = new THREE.MeshStandardMaterial({color:0x1a1a2e,roughness:0.7});
+const body = new THREE.Mesh(bodyGeo,bodyMat);
+body.position.set(0,0.35,0);
+devGroup.add(body);
 
-  // TEXT SPLIT EFFECT on name
-  gsap.fromTo('.hero-name .line1',{x:-80,opacity:0},{x:0,opacity:1,duration:1,delay:0.5,ease:'power3.out'});
-  gsap.fromTo('.hero-name .line2',{x:80,opacity:0},{x:0,opacity:1,duration:1,delay:0.7,ease:'power3.out'});
+// Shirt detail
+const shirtGeo = new THREE.BoxGeometry(0.42,0.5,0.25);
+const shirtMat = new THREE.MeshStandardMaterial({color:0x2d1b69,roughness:0.6});
+const shirt = new THREE.Mesh(shirtGeo,shirtMat);
+shirt.position.set(0,0.35,0);
+devGroup.add(shirt);
 
-  // SCROLL REVEALS
-  gsap.utils.toArray('.bento-card').forEach((el,i)=>{
-    gsap.fromTo(el,{opacity:0,y:40},{opacity:1,y:0,duration:0.7,delay:i*0.08,scrollTrigger:{trigger:el,start:'top 85%',once:true}});
+// Head
+const headGeo = new THREE.SphereGeometry(0.22,16,12);
+const headMat = new THREE.MeshStandardMaterial({color:0xd4956a,roughness:0.6});
+const head = new THREE.Mesh(headGeo,headMat);
+head.position.set(0,0.93,0);
+devGroup.add(head);
+
+// Hair
+const hairGeo = new THREE.SphereGeometry(0.23,16,8,0,Math.PI*2,0,Math.PI*0.5);
+const hairMat = new THREE.MeshStandardMaterial({color:0x1a0a00,roughness:0.9});
+const hair = new THREE.Mesh(hairGeo,hairMat);
+hair.position.set(0,0.98,0);
+devGroup.add(hair);
+
+// Eyes
+[-0.09,0.09].forEach(x=>{
+  const eyeG = new THREE.SphereGeometry(0.035,8,6);
+  const eyeM = new THREE.MeshBasicMaterial({color:0x111111});
+  const eye = new THREE.Mesh(eyeG,eyeM);
+  eye.position.set(x,0.97,0.19);
+  devGroup.add(eye);
+  // Eye glow
+  const glowG = new THREE.SphereGeometry(0.015,6,4);
+  const glowM = new THREE.MeshBasicMaterial({color:0x6366f1});
+  const glow = new THREE.Mesh(glowG,glowM);
+  glow.position.set(x,0.97,0.22);
+  devGroup.add(glow);
+});
+
+// Arms
+const armGeo = new THREE.CylinderGeometry(0.06,0.055,0.5,8);
+const armMat = new THREE.MeshStandardMaterial({color:0xd4956a,roughness:0.6});
+[-1,1].forEach(side=>{
+  const arm = new THREE.Mesh(armGeo,armMat);
+  arm.rotation.z = side * Math.PI*0.35;
+  arm.position.set(side*0.35,0.28,-0.05);
+  devGroup.add(arm);
+
+  // Hand
+  const handG = new THREE.SphereGeometry(0.065,8,6);
+  const handM = new THREE.MeshStandardMaterial({color:0xd4956a,roughness:0.6});
+  const hand = new THREE.Mesh(handG,handM);
+  hand.position.set(side*0.52,0.08,-0.05);
+  devGroup.add(hand);
+});
+
+// Legs / sitting
+const legGeo = new THREE.CylinderGeometry(0.08,0.07,0.4,8);
+const legMat = new THREE.MeshStandardMaterial({color:0x0d1117,roughness:0.7});
+[-0.12,0.12].forEach(x=>{
+  const leg = new THREE.Mesh(legGeo,legMat);
+  leg.rotation.x = Math.PI*0.45;
+  leg.position.set(x,-0.12,-0.15);
+  devGroup.add(leg);
+});
+
+// Chair back
+const chairBackGeo = new THREE.BoxGeometry(0.7,0.8,0.08);
+const chairMat = new THREE.MeshStandardMaterial({color:0x0d1117,roughness:0.5,metalness:0.3});
+const chairBack = new THREE.Mesh(chairBackGeo,chairMat);
+chairBack.position.set(0,0.3,-0.28);
+devGroup.add(chairBack);
+
+// Headphone
+const hpGeo = new THREE.TorusGeometry(0.18,0.04,6,12,Math.PI*1.1);
+const hpMat = new THREE.MeshStandardMaterial({color:0x6366f1,roughness:0.3,metalness:0.7});
+const hp = new THREE.Mesh(hpGeo,hpMat);
+hp.rotation.z = Math.PI*0.05;
+hp.position.set(0,1.06,0);
+devGroup.add(hp);
+
+devGroup.position.set(-1.5,-0.78,0.8);
+devGroup.rotation.y = 0.4;
+devGroup.scale.set(0.85,0.85,0.85);
+scene.add(devGroup);
+
+// Dev screen glow on face
+const faceLight = new THREE.PointLight(0x6366f1, 1.5, 2);
+faceLight.position.set(-1.5, 0.2, 1.5);
+scene.add(faceLight);
+
+// ── AMBIENT FLOATING RINGS ───────────────────────
+const rings = [];
+[0x6366f1,0x8b5cf6,0x06b6d4].forEach((color,i)=>{
+  const rg = new THREE.TorusGeometry(1.5+i*0.8, 0.015, 8, 64);
+  const rm = new THREE.MeshBasicMaterial({color, transparent:true, opacity:0.12});
+  const ring = new THREE.Mesh(rg, rm);
+  ring.rotation.x = Math.PI/3 + i*0.4;
+  ring.rotation.y = i*0.8;
+  ring.position.set(0, 0.5, -3);
+  scene.add(ring);
+  rings.push(ring);
+});
+
+// ── MOUSE PARALLAX ───────────────────────────────
+let mx=0, my=0, targetX=0, targetY=0;
+document.addEventListener('mousemove', e=>{
+  mx = (e.clientX/innerWidth - 0.5)*2;
+  my = (e.clientY/innerHeight - 0.5)*2;
+});
+window.addEventListener('resize',()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+let clock = 0;
+function animate3D(){
+  requestAnimationFrame(animate3D);
+  clock += 0.008;
+
+  targetX += (mx*0.6 - targetX)*0.04;
+  targetY += (-my*0.3 - targetY)*0.04;
+  camera.position.x = targetX;
+  camera.position.y = 1.5 + targetY;
+  camera.lookAt(0, 0.5, 0);
+
+  // Floaters
+  floaters.forEach((f,i)=>{
+    f.rotation.x += 0.008;
+    f.rotation.y += 0.012;
+    f.position.y = f.position.y + Math.sin(clock + i*1.2)*0.003;
   });
 
-  // TIMELINE ITEMS
-  document.querySelectorAll('.tl-item').forEach((el,i)=>{
+  // Rings
+  rings.forEach((r,i)=>{r.rotation.z += 0.002*(i+1);});
+
+  // Particles
+  particles.rotation.y += 0.0003;
+
+  // Screen flicker
+  screenLight.intensity = 2.5 + Math.sin(clock*3)*0.3;
+  monLight.intensity = 2 + Math.sin(clock*2+1)*0.2;
+
+  // Dev bob
+  devGroup.position.y = -0.78 + Math.sin(clock*0.7)*0.015;
+
+  // Mug steam
+  steam.scale.y = 1 + Math.sin(clock*2)*0.3;
+  steam.material.opacity = 0.2 + Math.sin(clock*1.5)*0.1;
+
+  renderer.render(scene, camera);
+}
+animate3D();
+
+// ═══════════════════════════════════════════════
+// CUSTOM CURSOR
+// ═══════════════════════════════════════════════
+const cdot = document.getElementById('cdot');
+const cring = document.getElementById('cring');
+let cx=0,cy=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;});
+(function cursorLoop(){
+  rx+=(cx-rx)*0.1; ry+=(cy-ry)*0.1;
+  cdot.style.cssText=`left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
+  cring.style.cssText=`left:${rx}px;top:${ry}px;transform:translate(-50%,-50%);` + (cring.classList.contains('h')?'width:56px;height:56px;':'');
+  requestAnimationFrame(cursorLoop);
+})();
+document.querySelectorAll('a,button,.pcard,.bc,.acard,.scard,.co-card,.pfb').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cring.classList.add('h'));
+  el.addEventListener('mouseleave',()=>cring.classList.remove('h'));
+});
+
+// ═══════════════════════════════════════════════
+// LOADER
+// ═══════════════════════════════════════════════
+const msgs = ['LOADING 3D SCENE','BUILDING DEVELOPER WORLD','COMPILING SHADERS','LAUNCHING PORTFOLIO'];
+let pct=0;
+const lbar=document.getElementById('lbar');
+const lpct=document.getElementById('lpct');
+const lmsg=document.getElementById('lmsg');
+const lInt=setInterval(()=>{
+  pct+=Math.random()*12+4;
+  if(pct>100)pct=100;
+  lbar.style.width=pct+'%';
+  lpct.textContent=Math.floor(pct)+'%';
+  lmsg.textContent=msgs[Math.floor(pct/26)]||'LAUNCHING';
+  if(pct>=100){
+    clearInterval(lInt);
+    setTimeout(()=>{
+      const ld=document.getElementById('loader');
+      gsap.to(ld,{opacity:0,scale:1.04,duration:0.9,ease:'power2.in',onComplete:()=>{
+        ld.style.display='none';
+        initPage();
+      }});
+    },400);
+  }
+},110);
+
+// ═══════════════════════════════════════════════
+// GSAP PAGE ANIMATIONS
+// ═══════════════════════════════════════════════
+function initPage(){
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.to('#nav',{opacity:1,duration:0.8,delay:0.2});
+
+  gsap.fromTo('#hpre',{opacity:0,y:20},{opacity:1,y:0,duration:0.7,delay:0.3});
+  gsap.fromTo('.hn1',{opacity:0,x:-60},{opacity:1,x:0,duration:0.9,delay:0.5,ease:'power3.out'});
+  gsap.fromTo('.hn2',{opacity:0,x:60},{opacity:1,x:0,duration:0.9,delay:0.7,ease:'power3.out'});
+  gsap.fromTo('#hsub',{opacity:0,y:20},{opacity:1,y:0,duration:0.7,delay:0.9});
+  gsap.fromTo('#hpills',{opacity:0,y:15},{opacity:1,y:0,duration:0.7,delay:1.1});
+  gsap.fromTo('#hbtns',{opacity:0,y:15},{opacity:1,y:0,duration:0.7,delay:1.3});
+  gsap.fromTo('#scroll-hint',{opacity:0},{opacity:1,duration:1,delay:2});
+
+  // BENTO
+  gsap.utils.toArray('.bc').forEach((el,i)=>{
+    gsap.fromTo(el,{opacity:0,y:35},{opacity:1,y:0,duration:0.6,delay:i*0.07,
+      scrollTrigger:{trigger:el,start:'top 85%',once:true}});
+  });
+
+  // TIMELINE
+  document.querySelectorAll('.tli').forEach((el,i)=>{
     ScrollTrigger.create({trigger:el,start:'top 80%',once:true,onEnter:()=>{
-      gsap.to(el,{opacity:1,x:0,duration:0.7,delay:i*0.1,ease:'power3.out'});
-      el.classList.add('vis');
+      gsap.to(el,{opacity:1,x:0,duration:0.65,delay:i*0.08,ease:'power3.out'});
+      el.classList.add('v');
     }});
   });
 
-  // PROJECT CARDS
-  document.querySelectorAll('.proj-card').forEach((el,i)=>{
-    ScrollTrigger.create({trigger:el,start:'top 85%',once:true,onEnter:()=>{
-      gsap.to(el,{opacity:1,y:0,duration:0.6,delay:(i%3)*0.1,ease:'power3.out'});
-      el.classList.add('vis');
+  // PROJECTS
+  document.querySelectorAll('.pcard').forEach((el,i)=>{
+    ScrollTrigger.create({trigger:el,start:'top 87%',once:true,onEnter:()=>{
+      gsap.to(el,{opacity:1,y:0,duration:0.55,delay:(i%4)*0.08,ease:'power3.out'});
+      el.classList.add('v');
+    }});
+  });
+
+  // CO-CARDS
+  document.querySelectorAll('.co-card').forEach((el,i)=>{
+    ScrollTrigger.create({trigger:el,start:'top 88%',once:true,onEnter:()=>{
+      gsap.to(el,{opacity:1,y:0,duration:0.5,delay:i*0.06,ease:'power3.out'});
+      el.classList.add('v');
     }});
   });
 
   // SKILLS + ACH
-  document.querySelectorAll('.sk-card,.ach-card').forEach((el,i)=>{
+  document.querySelectorAll('.scard,.acard').forEach((el,i)=>{
     ScrollTrigger.create({trigger:el,start:'top 88%',once:true,onEnter:()=>{
-      gsap.to(el,{opacity:1,y:0,duration:0.5,delay:i*0.06,ease:'power3.out'});
-      el.classList.add('vis');
+      gsap.to(el,{opacity:1,y:0,duration:0.5,delay:i*0.05,ease:'power3.out'});
+      el.classList.add('v');
     }});
   });
 
   // SECTION TITLES
-  gsap.utils.toArray('.sec-title').forEach(el=>{
-    gsap.fromTo(el,{opacity:0,y:30},{opacity:1,y:0,duration:0.8,scrollTrigger:{trigger:el,start:'top 85%',once:true}});
+  gsap.utils.toArray('.st').forEach(el=>{
+    gsap.fromTo(el,{opacity:0,y:25},{opacity:1,y:0,duration:0.7,
+      scrollTrigger:{trigger:el,start:'top 85%',once:true}});
   });
 }
 
-// ── PROJECT FILTER ───────────────────────────────────────────────────────────
-document.querySelectorAll('.pf-btn').forEach(btn=>{
+// ═══════════════════════════════════════════════
+// PROJECT FILTER
+// ═══════════════════════════════════════════════
+document.querySelectorAll('.pfb').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.pfb').forEach(b=>b.classList.remove('on'));
     btn.classList.add('on');
     const f=btn.dataset.f;
-    document.querySelectorAll('.proj-card').forEach(card=>{
-      const show=f==='all'||card.dataset.c===f;
-      gsap.to(card,{opacity:show?1:0,scale:show?1:0.95,duration:0.3,display:show?'block':'none'});
+    document.querySelectorAll('.pcard').forEach((c,i)=>{
+      const show=f==='all'||c.dataset.c===f;
+      gsap.to(c,{opacity:show?1:0,scale:show?1:0.94,y:show?0:10,duration:0.3,
+        onComplete:()=>{c.style.display=show?'':'none';}});
+      if(show) c.style.display='';
     });
   });
 });
 
-// ── BACK TO TOP ──────────────────────────────────────────────────────────────
+// BTT
 const btt=document.getElementById('btt');
-window.addEventListener('scroll',()=>{
-  btt.classList.toggle('show',window.scrollY>600);
-});
+window.addEventListener('scroll',()=>btt.classList.toggle('s',scrollY>500));
 
-// ── SMOOTH NAV ───────────────────────────────────────────────────────────────
+// SMOOTH NAV
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     e.preventDefault();
